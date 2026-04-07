@@ -1,0 +1,40 @@
+<nav class="navbar">
+  <div class="nav-container">
+    <%= link_to root_path, class: "nav-logo" do %>
+      <span class="logo-icon">🐵</span>
+      <span class="logo-text">SkinsMonkey</span>
+    <% end %>
+    
+    <div class="nav-links">
+      <%= link_to "Browse Skins", products_path, class: "nav-link" %>
+      
+      <% if logged_in? %>
+        <%= link_to wishlist_path, class: "nav-link" do %>
+          ❤️ Wishlist
+        <% end %>
+        
+        <%= link_to cart_path, class: "nav-link cart-link" do %>
+          🛒 Cart
+          <% if current_user.cart&.total_items.to_i > 0 %>
+            <span class="cart-badge"><%= current_user.cart.total_items %></span>
+          <% end %>
+        <% end %>
+        
+        <div class="nav-dropdown">
+          <button class="nav-link dropdown-toggle">
+            👤 <%= current_user.username %>
+          </button>
+          <div class="dropdown-menu">
+            <%= link_to "My Profile", user_path(current_user), class: "dropdown-item" %>
+            <%= link_to "My Orders", orders_path, class: "dropdown-item" %>
+            <div class="dropdown-divider"></div>
+            <%= button_to "Logout", logout_path, method: :delete, class: "dropdown-item logout-btn" %>
+          </div>
+        </div>
+      <% else %>
+        <%= link_to "Login", login_path, class: "nav-link" %>
+        <%= link_to "Sign Up", signup_path, class: "nav-link nav-cta" %>
+      <% end %>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,41 @@
+<div class="wishlist-page">
+  <h1>My Wishlist</h1>
+  
+  <% if @wishlist_items.any? %>
+    <div class="wishlist-grid">
+      <% @wishlist_items.each do |item| %>
+        <div class="wishlist-card">
+          <div class="wishlist-image">
+            <%= image_tag item.product.image_url || '/images/default_skin.png', alt: item.product.name %>
+            <span class="rarity-badge" style="background-color: <%= item.product.rarity_color %>">
+              <%= item.product.rarity.titleize %>
+            </span>
+          </div>
+          
+          <div class="wishlist-info">
+            <h3><%= link_to item.product.name, product_path(item.product) %></h3>
+            <p class="wishlist-price"><%= item.product.display_price %></p>
+            
+            <div class="wishlist-actions">
+              <%= button_to add_to_cart_path(product_id: item.product.id), class: "btn btn-primary btn-sm" do %>
+                Add to Cart
+              <% end %>
+              <%= button_to remove_from_wishlist_path(item), method: :delete,
+                  class: "btn btn-outline btn-sm btn-danger",
+                  form: { data: { turbo_confirm: "Remove from wishlist?" } } do %>
+                Remove
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="empty-wishlist">
+      <div class="empty-icon">❤️</div>
+      <h2>Your wishlist is empty</h2>
+      <p>Save your favorite skins here for later.</p>
+      <%= link_to "Browse Skins", products_path, class: "btn btn-primary btn-lg" %>
+    </div>
+  <% end %>
+</div>

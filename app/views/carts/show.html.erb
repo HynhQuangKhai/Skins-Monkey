@@ -1,0 +1,70 @@
+<div class="cart-page">
+  <h1>Shopping Cart</h1>
+  
+  <% if @cart_items.any? %>
+    <div class="cart-layout">
+      <div class="cart-items">
+        <% @cart_items.each do |item| %>
+          <div class="cart-item">
+            <div class="cart-item-image">
+              <%= image_tag item.product.image_url || '/images/default_skin.png', alt: item.product.name %>
+            </div>
+            
+            <div class="cart-item-details">
+              <h3><%= link_to item.product.name, product_path(item.product) %></h3>
+              <span class="rarity-tag" style="background-color: <%= item.product.rarity_color %>">
+                <%= item.product.rarity.titleize %>
+              </span>
+            </div>
+            
+            <div class="cart-item-price">
+              <%= item.product.display_price %>
+            </div>
+            
+            <div class="cart-item-quantity">
+              <%= form_with url: update_cart_item_path(item), method: :patch, class: "quantity-form" do |f| %>
+                <%= f.number_field :quantity, value: item.quantity, min: 1, class: "quantity-input" %>
+                <%= f.submit "Update", class: "btn btn-sm btn-outline" %>
+              <% end %>
+            </div>
+            
+            <div class="cart-item-total">
+              <%= item.display_total %>
+            </div>
+            
+            <%= button_to remove_from_cart_path(item), method: :delete, 
+                class: "btn btn-icon btn-danger", form: { data: { turbo_confirm: "Remove this item?" } } do %>
+              🗑️
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+      
+      <div class="cart-summary">
+        <h2>Order Summary</h2>
+        <div class="summary-row">
+          <span>Items (<%= @cart.total_items %>)</span>
+          <span><%= @cart.display_total %></span>
+        </div>
+        <div class="summary-row">
+          <span>Service Fee</span>
+          <span>Free</span>
+        </div>
+        <div class="summary-row total">
+          <span>Total</span>
+          <span><%= @cart.display_total %></span>
+        </div>
+        
+        <%= link_to "Proceed to Checkout", checkout_path, class: "btn btn-primary btn-lg btn-full" %>
+        <%= link_to "Continue Shopping", products_path, class: "btn btn-outline btn-full" %>
+      </div>
+    </div>
+  <% else %>
+    <div class="empty-cart">
+      <div class="empty-icon">🛒</div>
+      <h2>Your cart is empty</h2>
+      <p>Looks like you haven't added any skins yet.</p>
+      <%= link_to "Start Shopping", products_path, class: "btn btn-primary btn-lg" %>
+    </div>
+  <% end %>
+</div>

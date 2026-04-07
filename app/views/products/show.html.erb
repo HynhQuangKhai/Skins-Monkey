@@ -1,0 +1,63 @@
+<div class="product-detail-page">
+  <div class="product-detail-container">
+    <div class="product-image-section">
+      <%= image_tag @product.image_url || '/images/default_skin.png', alt: @product.name, class: 'product-detail-image' %>
+      <div class="product-badges">
+        <span class="badge rarity-badge" style="background-color: <%= @product.rarity_color %>">
+          <%= @product.rarity.titleize %>
+        </span>
+        <% if @product.wear.present? %>
+          <span class="badge wear-badge"><%= @product.wear.titleize %></span>
+        <% end %>
+        <% if @product.category.present? %>
+          <span class="badge category-badge"><%= @product.category.titleize %></span>
+        <% end %>
+      </div>
+    </div>
+    
+    <div class="product-info-section">
+      <h1 class="product-title"><%= @product.name %></h1>
+      <p class="product-price-large"><%= @product.display_price %></p>
+      
+      <% if @product.description.present? %>
+        <div class="product-description">
+          <h3>Description</h3>
+          <p><%= @product.description %></p>
+        </div>
+      <% end %>
+      
+      <div class="product-actions-large">
+        <%= button_to add_to_cart_path(product_id: @product.id), class: "btn btn-primary btn-lg" do %>
+          🛒 Add to Cart
+        <% end %>
+        
+        <% if @in_wishlist %>
+          <span class="in-wishlist">❤️ In Wishlist</span>
+        <% else %>
+          <%= button_to add_to_wishlist_path(product_id: @product.id), class: "btn btn-outline btn-lg" do %>
+            ❤️ Add to Wishlist
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  
+  <% if @related_products.any? %>
+    <div class="related-products">
+      <h2>Related Skins</h2>
+      <div class="products-grid small">
+        <% @related_products.each do |product| %>
+          <div class="product-card">
+            <%= link_to product_path(product) do %>
+              <%= image_tag product.image_url || '/images/default_skin.png', alt: product.name %>
+              <h4><%= product.name %></h4>
+              <p><%= product.display_price %></p>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+  
+  <%= link_to "← Back to Browse", products_path, class: "back-link" %>
+</div>

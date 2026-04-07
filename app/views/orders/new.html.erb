@@ -1,0 +1,81 @@
+<div class="checkout-page">
+  <h1>Checkout</h1>
+  
+  <div class="checkout-layout">
+    <div class="checkout-form-section">
+      <%= form_with model: @order, url: checkout_path, class: "checkout-form" do |f| %>
+        <% if @order.errors.any? %>
+          <div class="error-messages">
+            <ul>
+              <% @order.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+        
+        <div class="form-section">
+          <h3>Payment Method</h3>
+          <div class="payment-options">
+            <label class="payment-option">
+              <%= f.radio_button :payment_method, "credit_card", checked: true %>
+              <span class="payment-label">💳 Credit Card</span>
+            </label>
+            <label class="payment-option">
+              <%= f.radio_button :payment_method, "paypal" %>
+              <span class="payment-label">🅿️ PayPal</span>
+            </label>
+            <label class="payment-option">
+              <%= f.radio_button :payment_method, "crypto" %>
+              <span class="payment-label">₿ Cryptocurrency</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="form-section">
+          <h3>Steam Trade URL</h3>
+          <div class="form-group">
+            <%= f.label :shipping_address, "Enter your Steam Trade URL for delivery" %>
+            <%= f.text_area :shipping_address, class: "form-control", 
+                placeholder: "https://steamcommunity.com/tradeoffer/new/?partner=...&token=...",
+                rows: 3, required: true %>
+            <small class="help-text">Your skins will be delivered to this Steam account.</small>
+          </div>
+        </div>
+        
+        <%= f.submit "Place Order", class: "btn btn-primary btn-lg btn-full" %>
+      <% end %>
+    </div>
+    
+    <div class="checkout-summary">
+      <h2>Order Summary</h2>
+      <div class="checkout-items">
+        <% @cart_items.each do |item| %>
+          <div class="checkout-item">
+            <%= image_tag item.product.image_url || '/images/default_skin.png', class: 'checkout-thumb' %>
+            <div class="checkout-item-info">
+              <span class="item-name"><%= item.product.name %></span>
+              <span class="item-qty">Qty: <%= item.quantity %></span>
+            </div>
+            <span class="item-price"><%= item.display_total %></span>
+          </div>
+        <% end %>
+      </div>
+      
+      <div class="checkout-totals">
+        <div class="total-row">
+          <span>Subtotal</span>
+          <span><%= @cart.display_total %></span>
+        </div>
+        <div class="total-row">
+          <span>Service Fee</span>
+          <span>Free</span>
+        </div>
+        <div class="total-row grand-total">
+          <span>Total</span>
+          <span><%= @cart.display_total %></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

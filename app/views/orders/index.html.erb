@@ -1,0 +1,45 @@
+<div class="orders-page">
+  <h1>Order History</h1>
+  
+  <% if @orders.any? %>
+    <div class="orders-table-container">
+      <table class="orders-table">
+        <thead>
+          <tr>
+            <th>Order #</th>
+            <th>Date</th>
+            <th>Items</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @orders.each do |order| %>
+            <tr>
+              <td>#<%= order.id %></td>
+              <td><%= order.formatted_date %></td>
+              <td><%= order.order_items.sum(:quantity) %> items</td>
+              <td class="order-total"><%= order.display_total %></td>
+              <td>
+                <span class="status-badge <%= order.status_class %>">
+                  <%= order.status.titleize %>
+                </span>
+              </td>
+              <td>
+                <%= link_to "View Details", order_path(order), class: "btn btn-sm btn-outline" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="empty-orders">
+      <div class="empty-icon">📦</div>
+      <h2>No orders yet</h2>
+      <p>You haven't placed any orders. Start browsing our collection!</p>
+      <%= link_to "Browse Skins", products_path, class: "btn btn-primary btn-lg" %>
+    </div>
+  <% end %>
+</div>
