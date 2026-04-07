@@ -1,0 +1,1076 @@
+  [1m[35m (7.9ms)[0m  [1m[35mCREATE TABLE "schema_migrations" ("version" varchar NOT NULL PRIMARY KEY)[0m
+  [1m[35m (0.5ms)[0m  [1m[35mCREATE TABLE "ar_internal_metadata" ("key" varchar NOT NULL PRIMARY KEY, "value" varchar, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL)[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.2ms)[0m  [1m[34mSELECT * FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = ? ORDER BY "ar_internal_metadata"."key" ASC LIMIT 1[0m  [[nil, "environment"]]
+  [1m[36mActiveRecord::InternalMetadata Create (0.3ms)[0m  [1m[32mINSERT INTO "ar_internal_metadata" ("key", "value", "created_at", "updated_at") VALUES ('environment', 'development', '2026-04-07 11:53:04.882647', '2026-04-07 11:53:04.882650') RETURNING "key"[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Migrating to CreateUsers (20240101000001)
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[35m (2.2ms)[0m  [1m[35mCREATE TABLE "users" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "username" varchar NOT NULL, "email" varchar NOT NULL, "password_digest" varchar NOT NULL, "balance" decimal(10,2) DEFAULT 0.0, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL)[0m
+  [1m[35m (0.3ms)[0m  [1m[35mCREATE UNIQUE INDEX "index_users_on_email" ON "users" ("email")[0m
+  [1m[35m (0.2ms)[0m  [1m[35mCREATE UNIQUE INDEX "index_users_on_username" ON "users" ("username")[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20240101000001') RETURNING "version"[0m
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[36mcommit transaction[0m
+Migrating to CreateProducts (20240101000002)
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[35m (1.1ms)[0m  [1m[35mCREATE TABLE "products" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "name" varchar NOT NULL, "description" text, "price" decimal(10,2) NOT NULL, "rarity" varchar NOT NULL, "image_url" varchar, "category" varchar, "wear" varchar, "available" boolean DEFAULT 1, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL)[0m
+  [1m[35m (0.2ms)[0m  [1m[35mCREATE INDEX "index_products_on_rarity" ON "products" ("rarity")[0m
+  [1m[35m (0.2ms)[0m  [1m[35mCREATE INDEX "index_products_on_category" ON "products" ("category")[0m
+  [1m[35m (0.2ms)[0m  [1m[35mCREATE INDEX "index_products_on_available" ON "products" ("available")[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20240101000002') RETURNING "version"[0m
+  [1m[36mTRANSACTION (0.4ms)[0m  [1m[36mcommit transaction[0m
+Migrating to CreateCarts (20240101000003)
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[35m (3.2ms)[0m  [1m[35mCREATE TABLE "carts" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "user_id" integer NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_ea59a35211"
+FOREIGN KEY ("user_id")
+  REFERENCES "users" ("id")
+)[0m
+  [1m[35m (0.2ms)[0m  [1m[35mCREATE INDEX "index_carts_on_user_id" ON "carts" ("user_id")[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.1ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20240101000003') RETURNING "version"[0m
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[36mcommit transaction[0m
+Migrating to CreateCartItems (20240101000004)
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[35m (4.3ms)[0m  [1m[35mCREATE TABLE "cart_items" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "cart_id" integer NOT NULL, "product_id" integer NOT NULL, "quantity" integer DEFAULT 1 NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_6cdb1f0139"
+FOREIGN KEY ("cart_id")
+  REFERENCES "carts" ("id")
+, CONSTRAINT "fk_rails_681a180e84"
+FOREIGN KEY ("product_id")
+  REFERENCES "products" ("id")
+)[0m
+  [1m[35m (0.2ms)[0m  [1m[35mCREATE INDEX "index_cart_items_on_cart_id" ON "cart_items" ("cart_id")[0m
+  [1m[35m (0.2ms)[0m  [1m[35mCREATE INDEX "index_cart_items_on_product_id" ON "cart_items" ("product_id")[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.1ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20240101000004') RETURNING "version"[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+Migrating to CreateOrders (20240101000005)
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[35m (1.1ms)[0m  [1m[35mCREATE TABLE "orders" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "user_id" integer NOT NULL, "total_amount" decimal(10,2) NOT NULL, "status" varchar DEFAULT 'pending', "payment_method" varchar, "shipping_address" text, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_f868b47f6a"
+FOREIGN KEY ("user_id")
+  REFERENCES "users" ("id")
+)[0m
+  [1m[35m (0.2ms)[0m  [1m[35mCREATE INDEX "index_orders_on_user_id" ON "orders" ("user_id")[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20240101000005') RETURNING "version"[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+Migrating to CreateOrderItems (20240101000006)
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[35m (1.2ms)[0m  [1m[35mCREATE TABLE "order_items" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "order_id" integer NOT NULL, "product_id" integer NOT NULL, "quantity" integer NOT NULL, "price_at_time" decimal(10,2) NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_e3cb28f071"
+FOREIGN KEY ("order_id")
+  REFERENCES "orders" ("id")
+, CONSTRAINT "fk_rails_f1a29ddd47"
+FOREIGN KEY ("product_id")
+  REFERENCES "products" ("id")
+)[0m
+  [1m[35m (0.2ms)[0m  [1m[35mCREATE INDEX "index_order_items_on_order_id" ON "order_items" ("order_id")[0m
+  [1m[35m (0.2ms)[0m  [1m[35mCREATE INDEX "index_order_items_on_product_id" ON "order_items" ("product_id")[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.3ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20240101000006') RETURNING "version"[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+Migrating to CreateWishlists (20240101000007)
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[35m (2.6ms)[0m  [1m[35mCREATE TABLE "wishlists" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "user_id" integer NOT NULL, "product_id" integer NOT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_eb66139660"
+FOREIGN KEY ("user_id")
+  REFERENCES "users" ("id")
+, CONSTRAINT "fk_rails_4224d8f53b"
+FOREIGN KEY ("product_id")
+  REFERENCES "products" ("id")
+)[0m
+  [1m[35m (0.2ms)[0m  [1m[35mCREATE INDEX "index_wishlists_on_user_id" ON "wishlists" ("user_id")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "index_wishlists_on_product_id" ON "wishlists" ("product_id")[0m
+  [1m[35m (0.3ms)[0m  [1m[35mCREATE UNIQUE INDEX "index_wishlists_on_user_id_and_product_id" ON "wishlists" ("user_id", "product_id")[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20240101000007') RETURNING "version"[0m
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Started GET "/" for ::1 at 2026-04-07 18:55:17 +0700
+  [1m[36mActiveRecord::SchemaMigration Load (0.4ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Processing by ProductsController#index as HTML
+Completed 500 Internal Server Error in 207ms (ActiveRecord: 0.0ms | Allocations: 2464)
+
+
+  
+NameError (uninitialized constant ApplicationRecord):
+  
+app/models/product.rb:1:in '<main>'
+app/controllers/products_controller.rb:3:in 'ProductsController#index'
+Started GET "/favicon.ico" for ::1 at 2026-04-07 18:55:24 +0700
+  
+ActionController::RoutingError (No route matches [GET] "/favicon.ico"):
+  
+Started GET "/" for ::1 at 2026-04-07 18:55:39 +0700
+Processing by ProductsController#index as HTML
+Completed 500 Internal Server Error in 10ms (ActiveRecord: 0.0ms | Allocations: 680)
+
+
+  
+NameError (uninitialized constant ApplicationRecord):
+  
+app/models/product.rb:1:in '<main>'
+app/controllers/products_controller.rb:3:in 'ProductsController#index'
+Started GET "/" for ::1 at 2026-04-07 18:55:40 +0700
+Processing by ProductsController#index as HTML
+Completed 500 Internal Server Error in 12ms (ActiveRecord: 0.0ms | Allocations: 678)
+
+
+  
+NameError (uninitialized constant ApplicationRecord):
+  
+app/models/product.rb:1:in '<main>'
+app/controllers/products_controller.rb:3:in 'ProductsController#index'
+Started GET "/favicon.ico" for ::1 at 2026-04-07 18:55:45 +0700
+  
+ActionController::RoutingError (No route matches [GET] "/favicon.ico"):
+  
+Started GET "/" for ::1 at 2026-04-07 18:58:29 +0700
+  [1m[36mActiveRecord::SchemaMigration Load (0.3ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Processing by ProductsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering products/index.html.erb within layouts/application
+  [1m[36mProduct Exists? (0.8ms)[0m  [1m[34mSELECT 1 AS one FROM "products" WHERE "products"."available" = ? LIMIT ?[0m  [["available", 1], ["LIMIT", 1]]
+  ↳ app/views/products/index.html.erb:47:in '_app_views_products_index_html_erb___601777427_9560'
+  Rendered products/index.html.erb within layouts/application (Duration: 138.9ms | Allocations: 8860)
+  Rendered layout layouts/application.html.erb (Duration: 401.1ms | Allocations: 24822)
+Completed 500 Internal Server Error in 1075ms (ActiveRecord: 65.3ms | Allocations: 43681)
+
+
+  
+ActionView::Template::Error (link_tree argument must be a directory):
+  
+sprockets (4.2.2) lib/sprockets/directive_processor.rb:407:in 'Sprockets::DirectiveProcessor#expand_relative_dirname'
+sprockets (4.2.2) lib/sprockets/directive_processor.rb:359:in 'Sprockets::DirectiveProcessor#process_link_tree_directive'
+sprockets (4.2.2) lib/sprockets/directive_processor.rb:189:in 'block in Sprockets::DirectiveProcessor#process_directives'
+sprockets (4.2.2) lib/sprockets/directive_processor.rb:187:in 'Array#each'
+sprockets (4.2.2) lib/sprockets/directive_processor.rb:187:in 'Sprockets::DirectiveProcessor#process_directives'
+sprockets (4.2.2) lib/sprockets/directive_processor.rb:84:in 'Sprockets::DirectiveProcessor#_call'
+sprockets (4.2.2) lib/sprockets/directive_processor.rb:65:in 'Sprockets::DirectiveProcessor#call'
+sprockets (4.2.2) lib/sprockets/processor_utils.rb:84:in 'Sprockets::ProcessorUtils#call_processor'
+sprockets (4.2.2) lib/sprockets/processor_utils.rb:66:in 'block in Sprockets::ProcessorUtils#call_processors'
+sprockets (4.2.2) lib/sprockets/processor_utils.rb:65:in 'Array#reverse_each'
+sprockets (4.2.2) lib/sprockets/processor_utils.rb:65:in 'Sprockets::ProcessorUtils#call_processors'
+sprockets (4.2.2) lib/sprockets/loader.rb:184:in 'Sprockets::Loader#load_from_unloaded'
+sprockets (4.2.2) lib/sprockets/loader.rb:59:in 'block in Sprockets::Loader#load'
+sprockets (4.2.2) lib/sprockets/loader.rb:339:in 'Sprockets::Loader#fetch_asset_from_dependency_cache'
+sprockets (4.2.2) lib/sprockets/loader.rb:43:in 'Sprockets::Loader#load'
+sprockets (4.2.2) lib/sprockets/cached_environment.rb:44:in 'block in Sprockets::CachedEnvironment#load'
+concurrent-ruby (1.3.6) lib/concurrent-ruby/concurrent/map.rb:207:in 'block in Concurrent::Map#fetch_or_store'
+concurrent-ruby (1.3.6) lib/concurrent-ruby/concurrent/map.rb:187:in 'Concurrent::Map#fetch'
+concurrent-ruby (1.3.6) lib/concurrent-ruby/concurrent/map.rb:206:in 'Concurrent::Map#fetch_or_store'
+sprockets (4.2.2) lib/sprockets/cached_environment.rb:44:in 'Sprockets::CachedEnvironment#load'
+sprockets (4.2.2) lib/sprockets/bundle.rb:27:in 'Sprockets::Bundle.call'
+sprockets (4.2.2) lib/sprockets/processor_utils.rb:84:in 'Sprockets::ProcessorUtils#call_processor'
+sprockets (4.2.2) lib/sprockets/processor_utils.rb:66:in 'block in Sprockets::ProcessorUtils#call_processors'
+sprockets (4.2.2) lib/sprockets/processor_utils.rb:65:in 'Array#reverse_each'
+sprockets (4.2.2) lib/sprockets/processor_utils.rb:65:in 'Sprockets::ProcessorUtils#call_processors'
+sprockets (4.2.2) lib/sprockets/loader.rb:184:in 'Sprockets::Loader#load_from_unloaded'
+sprockets (4.2.2) lib/sprockets/loader.rb:59:in 'block in Sprockets::Loader#load'
+sprockets (4.2.2) lib/sprockets/loader.rb:339:in 'Sprockets::Loader#fetch_asset_from_dependency_cache'
+sprockets (4.2.2) lib/sprockets/loader.rb:43:in 'Sprockets::Loader#load'
+sprockets (4.2.2) lib/sprockets/cached_environment.rb:44:in 'block in Sprockets::CachedEnvironment#load'
+concurrent-ruby (1.3.6) lib/concurrent-ruby/concurrent/map.rb:207:in 'block in Concurrent::Map#fetch_or_store'
+concurrent-ruby (1.3.6) lib/concurrent-ruby/concurrent/map.rb:187:in 'Concurrent::Map#fetch'
+concurrent-ruby (1.3.6) lib/concurrent-ruby/concurrent/map.rb:206:in 'Concurrent::Map#fetch_or_store'
+sprockets (4.2.2) lib/sprockets/cached_environment.rb:44:in 'Sprockets::CachedEnvironment#load'
+sprockets (4.2.2) lib/sprockets/base.rb:81:in 'Sprockets::Base#find_asset'
+sprockets (4.2.2) lib/sprockets/base.rb:88:in 'Sprockets::Base#find_all_linked_assets'
+sprockets (4.2.2) lib/sprockets/manifest.rb:125:in 'Enumerator#each'
+sprockets (4.2.2) lib/sprockets/manifest.rb:125:in 'Enumerable#to_a'
+sprockets (4.2.2) lib/sprockets/manifest.rb:125:in 'block (2 levels) in Sprockets::Manifest#find'
+concurrent-ruby (1.3.6) lib/concurrent-ruby/concurrent/executor/safe_task_executor.rb:24:in 'block in Concurrent::SafeTaskExecutor#execute'
+concurrent-ruby (1.3.6) lib/concurrent-ruby/concurrent/synchronization/mutex_lockable_object.rb:48:in 'block in Concurrent::Synchronization::MutexLockableObject#synchronize'
+concurrent-ruby (1.3.6) lib/concurrent-ruby/concurrent/synchronization/mutex_lockable_object.rb:48:in 'Thread::Mutex#synchronize'
+concurrent-ruby (1.3.6) lib/concurrent-ruby/concurrent/synchronization/mutex_lockable_object.rb:48:in 'Concurrent::Synchronization::MutexLockableObject#synchronize'
+concurrent-ruby (1.3.6) lib/concurrent-ruby/concurrent/executor/safe_task_executor.rb:22:in 'Concurrent::SafeTaskExecutor#execute'
+concurrent-ruby (1.3.6) lib/concurrent-ruby/concurrent/promise.rb:564:in 'block in Concurrent::Promise#realize'
+concurrent-ruby (1.3.6) lib/concurrent-ruby/concurrent/executor/ruby_thread_pool_executor.rb:382:in 'Concurrent::RubyThreadPoolExecutor::Worker#run_task'
+concurrent-ruby (1.3.6) lib/concurrent-ruby/concurrent/executor/ruby_thread_pool_executor.rb:372:in 'block (3 levels) in Concurrent::RubyThreadPoolExecutor::Worker#create_worker'
+<internal:kernel>:168:in 'Kernel#loop'
+concurrent-ruby (1.3.6) lib/concurrent-ruby/concurrent/executor/ruby_thread_pool_executor.rb:361:in 'block (2 levels) in Concurrent::RubyThreadPoolExecutor::Worker#create_worker'
+concurrent-ruby (1.3.6) lib/concurrent-ruby/concurrent/executor/ruby_thread_pool_executor.rb:358:in 'Kernel#catch'
+concurrent-ruby (1.3.6) lib/concurrent-ruby/concurrent/executor/ruby_thread_pool_executor.rb:358:in 'block in Concurrent::RubyThreadPoolExecutor::Worker#create_worker'
+Started GET "/" for ::1 at 2026-04-07 18:59:19 +0700
+Processing by ProductsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering products/index.html.erb within layouts/application
+  [1m[36mProduct Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "products" WHERE "products"."available" = ? LIMIT ?[0m  [["available", 1], ["LIMIT", 1]]
+  ↳ app/views/products/index.html.erb:47:in '_app_views_products_index_html_erb___601777427_9560'
+  Rendered products/index.html.erb within layouts/application (Duration: 19.9ms | Allocations: 5273)
+  Rendered layouts/_navbar.html.erb (Duration: 5.6ms | Allocations: 496)
+  Rendered layouts/_footer.html.erb (Duration: 5.5ms | Allocations: 321)
+  Rendered layout layouts/application.html.erb (Duration: 587.6ms | Allocations: 23931)
+Completed 200 OK in 624ms (Views: 613.9ms | ActiveRecord: 0.2ms | Allocations: 24283)
+
+
+Started GET "/products" for ::1 at 2026-04-07 18:59:26 +0700
+Processing by ProductsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering products/index.html.erb within layouts/application
+  [1m[36mProduct Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "products" WHERE "products"."available" = ? LIMIT ?[0m  [["available", 1], ["LIMIT", 1]]
+  ↳ app/views/products/index.html.erb:47:in '_app_views_products_index_html_erb___601777427_9560'
+  Rendered products/index.html.erb within layouts/application (Duration: 56.0ms | Allocations: 5268)
+  Rendered layouts/_navbar.html.erb (Duration: 0.4ms | Allocations: 100)
+  Rendered layouts/_footer.html.erb (Duration: 1.3ms | Allocations: 90)
+  Rendered layout layouts/application.html.erb (Duration: 1419.5ms | Allocations: 16785)
+Completed 200 OK in 1471ms (Views: 1458.1ms | ActiveRecord: 0.2ms | Allocations: 17085)
+
+
+Started GET "/products" for ::1 at 2026-04-07 18:59:29 +0700
+Processing by ProductsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering products/index.html.erb within layouts/application
+  [1m[36mProduct Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "products" WHERE "products"."available" = ? LIMIT ?[0m  [["available", 1], ["LIMIT", 1]]
+  ↳ app/views/products/index.html.erb:47:in '_app_views_products_index_html_erb___601777427_9560'
+  Rendered products/index.html.erb within layouts/application (Duration: 37.8ms | Allocations: 5268)
+  Rendered layouts/_navbar.html.erb (Duration: 3.5ms | Allocations: 100)
+  Rendered layouts/_footer.html.erb (Duration: 0.4ms | Allocations: 90)
+  Rendered layout layouts/application.html.erb (Duration: 168.0ms | Allocations: 6605)
+Completed 200 OK in 258ms (Views: 237.0ms | ActiveRecord: 0.2ms | Allocations: 6905)
+
+
+Started GET "/login" for ::1 at 2026-04-07 18:59:32 +0700
+Processing by SessionsController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering sessions/new.html.erb within layouts/application
+  Rendered sessions/new.html.erb within layouts/application (Duration: 187.3ms | Allocations: 2710)
+  Rendered layouts/_navbar.html.erb (Duration: 0.7ms | Allocations: 100)
+  Rendered layouts/_footer.html.erb (Duration: 0.3ms | Allocations: 90)
+  Rendered layout layouts/application.html.erb (Duration: 279.4ms | Allocations: 3866)
+Completed 200 OK in 383ms (Views: 337.5ms | ActiveRecord: 0.0ms | Allocations: 4583)
+
+
+Started GET "/" for ::1 at 2026-04-07 18:59:35 +0700
+Processing by ProductsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering products/index.html.erb within layouts/application
+  [1m[36mProduct Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "products" WHERE "products"."available" = ? LIMIT ?[0m  [["available", 1], ["LIMIT", 1]]
+  ↳ app/views/products/index.html.erb:47:in '_app_views_products_index_html_erb___601777427_9560'
+  Rendered products/index.html.erb within layouts/application (Duration: 140.7ms | Allocations: 5269)
+  Rendered layouts/_navbar.html.erb (Duration: 0.3ms | Allocations: 100)
+  Rendered layouts/_footer.html.erb (Duration: 0.4ms | Allocations: 90)
+  Rendered layout layouts/application.html.erb (Duration: 646.2ms | Allocations: 6621)
+Completed 200 OK in 760ms (Views: 713.0ms | ActiveRecord: 0.2ms | Allocations: 6921)
+
+
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[36mProduct Load (0.2ms)[0m  [1m[34mSELECT "products".* FROM "products"[0m
+  [1m[36mUser Load (0.1ms)[0m  [1m[34mSELECT "users".* FROM "users"[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.5ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "★ Karambit | Fade"], ["description", "A deadly karambit with a beautiful fade pattern."], ["price", 850.0], ["rarity", "knives"], ["image_url", "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvFi08_M1F8kgJOssge1JD5g2unnYTVN-NO4q4yCkPbnM66DzzkG6ZInj7yZo9qjiVK7-l0sZWCmLY6SI1Q6YF_TzFK5lLvm1MXt7c-YwiMy72Zx5CvD30vgJJQ4EA/360fx360f"], ["category", "knife"], ["wear", "factory_new"], ["available", 1], ["created_at", "2026-04-07 12:00:53.750908"], ["updated_at", "2026-04-07 12:00:53.750908"]]
+  [1m[36mTRANSACTION (6.6ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.3ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "★ Butterfly Knife | Doppler (Ruby)"], ["description", "A butterfly knife with a stunning ruby doppler pattern."], ["price", 1200.0], ["rarity", "knives"], ["image_url", "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvFi08_M1F8kgJOssge1JD5g2unnYTVN-NO4q4yCkPbnM66DzzkG6ZInj7yZo9qjiVK7-l0sZWCmLY6SI1Q6YF_TzFK5lLvm1MXt7c-YwiMy72Zx5CvD30vgJJQ4EA/360fx360f"], ["category", "knife"], ["wear", "factory_new"], ["available", 1], ["created_at", "2026-04-07 12:00:53.764256"], ["updated_at", "2026-04-07 12:00:53.764256"]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.4ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "★ M9 Bayonet | Crimson Web"], ["description", "An M9 bayonet with a distinctive crimson web pattern."], ["price", 650.0], ["rarity", "knives"], ["image_url", "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvFi08_M1F8kgJOssge1JD5g2unnYTVN-NO4q4yCkPbnM66DzzkG6ZInj7yZo9qjiVK7-l0sZWCmLY6SI1Q6YF_TzFK5lLvm1MXt7c-YwiMy72Zx5CvD30vgJJQ4EA/360fx360f"], ["category", "knife"], ["wear", "minimal_wear"], ["available", 1], ["created_at", "2026-04-07 12:00:53.769745"], ["updated_at", "2026-04-07 12:00:53.769745"]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (2.3ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "AK-47 | Fire Serpent"], ["description", "A legendary AK-47 skin with a fire serpent design."], ["price", 450.0], ["rarity", "covert"], ["image_url", "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvFi08_M1F8kgJOssge1JD5g2unnYTVN-NO4q4yCkPbnM66DzzkG6ZInj7yZo9qjiVK7-l0sZWCmLY6SI1Q6YF_TzFK5lLvm1MXt7c-YwiMy72Zx5CvD30vgJJQ4EA/360fx360f"], ["category", "rifle"], ["wear", "field_tested"], ["available", 1], ["created_at", "2026-04-07 12:00:53.774570"], ["updated_at", "2026-04-07 12:00:53.774570"]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.6ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "M4A4 | Howl"], ["description", "A contraband M4A4 skin featuring a howling wolf."], ["price", 1800.0], ["rarity", "covert"], ["image_url", "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvFi08_M1F8kgJOssge1JD5g2unnYTVN-NO4q4yCkPbnM66DzzkG6ZInj7yZo9qjiVK7-l0sZWCmLY6SI1Q6YF_TzFK5lLvm1MXt7c-YwiMy72Zx5CvD30vgJJQ4EA/360fx360f"], ["category", "rifle"], ["wear", "factory_new"], ["available", 1], ["created_at", "2026-04-07 12:00:53.780665"], ["updated_at", "2026-04-07 12:00:53.780665"]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.4ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "AWP | Dragon Lore"], ["description", "The most iconic AWP skin featuring a majestic dragon."], ["price", 2500.0], ["rarity", "covert"], ["image_url", "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvFi08_M1F8kgJOssge1JD5g2unnYTVN-NO4q4yCkPbnM66DzzkG6ZInj7yZo9qjiVK7-l0sZWCmLY6SI1Q6YF_TzFK5lLvm1MXt7c-YwiMy72Zx5CvD30vgJJQ4EA/360fx360f"], ["category", "rifle"], ["wear", "minimal_wear"], ["available", 1], ["created_at", "2026-04-07 12:00:53.785923"], ["updated_at", "2026-04-07 12:00:53.785923"]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.2ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "AK-47 | Case Hardened"], ["description", "An AK-47 with a unique case hardened finish."], ["price", 180.0], ["rarity", "classified"], ["image_url", "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvFi08_M1F8kgJOssge1JD5g2unnYTVN-NO4q4yCkPbnM66DzzkG6ZInj7yZo9qjiVK7-l0sZWCmLY6SI1Q6YF_TzFK5lLvm1MXt7c-YwiMy72Zx5CvD30vgJJQ4EA/360fx360f"], ["category", "rifle"], ["wear", "field_tested"], ["available", 1], ["created_at", "2026-04-07 12:00:53.791061"], ["updated_at", "2026-04-07 12:00:53.791061"]]
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.6ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "M4A1-S | Hyper Beast"], ["description", "A vibrant, chaotic M4A1-S skin featuring a mythical creature."], ["price", 85.0], ["rarity", "covert"], ["image_url", "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvFi08_M1F8kgJOssge1JD5g2unnYTVN-NO4q4yCkPbnM66DzzkG6ZInj7yZo9qjiVK7-l0sZWCmLY6SI1Q6YF_TzFK5lLvm1MXt7c-YwiMy72Zx5CvD30vgJJQ4EA/360fx360f"], ["category", "rifle"], ["wear", "field_tested"], ["available", 1], ["created_at", "2026-04-07 12:00:53.796471"], ["updated_at", "2026-04-07 12:00:53.796471"]]
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.3ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "SCAR-20 | Bloodsport"], ["description", "A striking red and black SCAR-20 skin."], ["price", 12.0], ["rarity", "classified"], ["image_url", "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvFi08_M1F8kgJOssge1JD5g2unnYTVN-NO4q4yCkPbnM66DzzkG6ZInj7yZo9qjiVK7-l0sZWCmLY6SI1Q6YF_TzFK5lLvm1MXt7c-YwiMy72Zx5CvD30vgJJQ4EA/360fx360f"], ["category", "rifle"], ["wear", "factory_new"], ["available", 1], ["created_at", "2026-04-07 12:00:53.801544"], ["updated_at", "2026-04-07 12:00:53.801544"]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.1ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "Glock-18 | Fade"], ["description", "A Glock with a beautiful fade gradient finish."], ["price", 950.0], ["rarity", "restricted"], ["image_url", "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvFi08_M1F8kgJOssge1JD5g2unnYTVN-NO4q4yCkPbnM66DzzkG6ZInj7yZo9qjiVK7-l0sZWCmLY6SI1Q6YF_TzFK5lLvm1MXt7c-YwiMy72Zx5CvD30vgJJQ4EA/360fx360f"], ["category", "pistol"], ["wear", "factory_new"], ["available", 1], ["created_at", "2026-04-07 12:00:53.807401"], ["updated_at", "2026-04-07 12:00:53.807401"]]
+  [1m[36mTRANSACTION (0.5ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.6ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "Desert Eagle | Blaze"], ["description", "A Desert Eagle with a blazing fire pattern."], ["price", 320.0], ["rarity", "restricted"], ["image_url", "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvFi08_M1F8kgJOssge1JD5g2unnYTVN-NO4q4yCkPbnM66DzzkG6ZInj7yZo9qjiVK7-l0sZWCmLY6SI1Q6YF_TzFK5lLvm1MXt7c-YwiMy72Zx5CvD30vgJJQ4EA/360fx360f"], ["category", "pistol"], ["wear", "factory_new"], ["available", 1], ["created_at", "2026-04-07 12:00:53.812465"], ["updated_at", "2026-04-07 12:00:53.812465"]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.2ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "USP-S | Kill Confirmed"], ["description", "A USP-S skin featuring a dramatic skull design."], ["price", 65.0], ["rarity", "covert"], ["image_url", "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvFi08_M1F8kgJOssge1JD5g2unnYTVN-NO4q4yCkPbnM66DzzkG6ZInj7yZo9qjiVK7-l0sZWCmLY6SI1Q6YF_TzFK5lLvm1MXt7c-YwiMy72Zx5CvD30vgJJQ4EA/360fx360f"], ["category", "pistol"], ["wear", "minimal_wear"], ["available", 1], ["created_at", "2026-04-07 12:00:53.817591"], ["updated_at", "2026-04-07 12:00:53.817591"]]
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.1ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "P2000 | Fire Elemental"], ["description", "A mystical P2000 with a fire elemental design."], ["price", 15.0], ["rarity", "classified"], ["image_url", "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvFi08_M1F8kgJOssge1JD5g2unnYTVN-NO4q4yCkPbnM66DzzkG6ZInj7yZo9qjiVK7-l0sZWCmLY6SI1Q6YF_TzFK5lLvm1MXt7c-YwiMy72Zx5CvD30vgJJQ4EA/360fx360f"], ["category", "pistol"], ["wear", "field_tested"], ["available", 1], ["created_at", "2026-04-07 12:00:53.821672"], ["updated_at", "2026-04-07 12:00:53.821672"]]
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.7ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "Five-SeveN | Monkey Business"], ["description", "A playful banana-themed Five-SeveN skin."], ["price", 3.5], ["rarity", "classified"], ["image_url", "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvFi08_M1F8kgJOssge1JD5g2unnYTVN-NO4q4yCkPbnM66DzzkG6ZInj7yZo9qjiVK7-l0sZWCmLY6SI1Q6YF_TzFK5lLvm1MXt7c-YwiMy72Zx5CvD30vgJJQ4EA/360fx360f"], ["category", "pistol"], ["wear", "field_tested"], ["available", 1], ["created_at", "2026-04-07 12:00:53.825553"], ["updated_at", "2026-04-07 12:00:53.825553"]]
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.3ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "★ Sport Gloves | Pandora's Box"], ["description", "Sporty gloves with a mysterious purple and black design."], ["price", 1500.0], ["rarity", "gloves"], ["image_url", "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvFi08_M1F8kgJOssge1JD5g2unnYTVN-NO4q4yCkPbnM66DzzkG6ZInj7yZo9qjiVK7-l0sZWCmLY6SI1Q6YF_TzFK5lLvm1MXt7c-YwiMy72Zx5CvD30vgJJQ4EA/360fx360f"], ["category", "gloves"], ["wear", "field_tested"], ["available", 1], ["created_at", "2026-04-07 12:00:53.830633"], ["updated_at", "2026-04-07 12:00:53.830633"]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.2ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "★ Specialist Gloves | Crimson Kimono"], ["description", "Elegant red gloves with traditional Japanese patterns."], ["price", 950.0], ["rarity", "gloves"], ["image_url", "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvFi08_M1F8kgJOssge1JD5g2unnYTVN-NO4q4yCkPbnM66DzzkG6ZInj7yZo9qjiVK7-l0sZWCmLY6SI1Q6YF_TzFK5lLvm1MXt7c-YwiMy72Zx5CvD30vgJJQ4EA/360fx360f"], ["category", "gloves"], ["wear", "minimal_wear"], ["available", 1], ["created_at", "2026-04-07 12:00:53.834849"], ["updated_at", "2026-04-07 12:00:53.834849"]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.0ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "MP7 | Bloodsport"], ["description", "A futuristic MP7 skin with racing aesthetics."], ["price", 8.0], ["rarity", "classified"], ["image_url", "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvFi08_M1F8kgJOssge1JD5g2unnYTVN-NO4q4yCkPbnM66DzzkG6ZInj7yZo9qjiVK7-l0sZWCmLY6SI1Q6YF_TzFK5lLvm1MXt7c-YwiMy72Zx5CvD30vgJJQ4EA/360fx360f"], ["category", "smg"], ["wear", "factory_new"], ["available", 1], ["created_at", "2026-04-07 12:00:53.839646"], ["updated_at", "2026-04-07 12:00:53.839646"]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.2ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "P90 | Asiimov"], ["description", "A sci-fi inspired P90 skin with orange and white accents."], ["price", 22.0], ["rarity", "covert"], ["image_url", "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvFi08_M1F8kgJOssge1JD5g2unnYTVN-NO4q4yCkPbnM66DzzkG6ZInj7yZo9qjiVK7-l0sZWCmLY6SI1Q6YF_TzFK5lLvm1MXt7c-YwiMy72Zx5CvD30vgJJQ4EA/360fx360f"], ["category", "smg"], ["wear", "field_tested"], ["available", 1], ["created_at", "2026-04-07 12:00:53.843965"], ["updated_at", "2026-04-07 12:00:53.843965"]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.1ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "MAC-10 | Neon Rider"], ["description", "A vibrant neon-themed MAC-10 skin."], ["price", 6.5], ["rarity", "classified"], ["image_url", "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvFi08_M1F8kgJOssge1JD5g2unnYTVN-NO4q4yCkPbnM66DzzkG6ZInj7yZo9qjiVK7-l0sZWCmLY6SI1Q6YF_TzFK5lLvm1MXt7c-YwiMy72Zx5CvD30vgJJQ4EA/360fx360f"], ["category", "smg"], ["wear", "minimal_wear"], ["available", 1], ["created_at", "2026-04-07 12:00:53.848715"], ["updated_at", "2026-04-07 12:00:53.848715"]]
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.4ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "Nova | Antique"], ["description", "An elegant nova with ornate engravings."], ["price", 2.5], ["rarity", "classified"], ["image_url", "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvFi08_M1F8kgJOssge1JD5g2unnYTVN-NO4q4yCkPbnM66DzzkG6ZInj7yZo9qjiVK7-l0sZWCmLY6SI1Q6YF_TzFK5lLvm1MXt7c-YwiMy72Zx5CvD30vgJJQ4EA/360fx360f"], ["category", "heavy"], ["wear", "field_tested"], ["available", 1], ["created_at", "2026-04-07 12:00:53.852911"], ["updated_at", "2026-04-07 12:00:53.852911"]]
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (2.1ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "XM1014 | Seasons"], ["description", "An XM1014 with a beautiful seasonal leaf pattern."], ["price", 4.0], ["rarity", "restricted"], ["image_url", "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvFi08_M1F8kgJOssge1JD5g2unnYTVN-NO4q4yCkPbnM66DzzkG6ZInj7yZo9qjiVK7-l0sZWCmLY6SI1Q6YF_TzFK5lLvm1MXt7c-YwiMy72Zx5CvD30vgJJQ4EA/360fx360f"], ["category", "heavy"], ["wear", "minimal_wear"], ["available", 1], ["created_at", "2026-04-07 12:00:53.857145"], ["updated_at", "2026-04-07 12:00:53.857145"]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.3ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "MAG-7 | Heat"], ["description", "A fiery MAG-7 skin with molten metal appearance."], ["price", 1.5], ["rarity", "restricted"], ["image_url", "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvFi08_M1F8kgJOssge1JD5g2unnYTVN-NO4q4yCkPbnM66DzzkG6ZInj7yZo9qjiVK7-l0sZWCmLY6SI1Q6YF_TzFK5lLvm1MXt7c-YwiMy72Zx5CvD30vgJJQ4EA/360fx360f"], ["category", "heavy"], ["wear", "well_worn"], ["available", 1], ["created_at", "2026-04-07 12:00:53.863223"], ["updated_at", "2026-04-07 12:00:53.863223"]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.2ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "Cmdr. Mae 'Dead Cold' Jamison | SWAT"], ["description", "A SWAT team commander with tactical gear."], ["price", 8.0], ["rarity", "milspec"], ["image_url", "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvFi08_M1F8kgJOssge1JD5g2unnYTVN-NO4q4yCkPbnM66DzzkG6ZInj7yZo9qjiVK7-l0sZWCmLY6SI1Q6YF_TzFK5lLvm1MXt7c-YwiMy72Zx5CvD30vgJJQ4EA/360fx360f"], ["category", "agent"], ["wear", nil], ["available", 1], ["created_at", "2026-04-07 12:00:53.868133"], ["updated_at", "2026-04-07 12:00:53.868133"]]
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.6ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "Sir Bloody Miami Darryl | The Professionals"], ["description", "A stylish agent with vibrant Miami vibes."], ["price", 25.0], ["rarity", "restricted"], ["image_url", "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvFi08_M1F8kgJOssge1JD5g2unnYTVN-NO4q4yCkPbnM66DzzkG6ZInj7yZo9qjiVK7-l0sZWCmLY6SI1Q6YF_TzFK5lLvm1MXt7c-YwiMy72Zx5CvD30vgJJQ4EA/360fx360f"], ["category", "agent"], ["wear", nil], ["available", 1], ["created_at", "2026-04-07 12:00:53.872268"], ["updated_at", "2026-04-07 12:00:53.872268"]]
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.4ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "s1mple (Gold) | 2022 Legends"], ["description", "A gold sticker of the legendary player s1mple."], ["price", 45.0], ["rarity", "milspec"], ["image_url", "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvFi08_M1F8kgJOssge1JD5g2unnYTVN-NO4q4yCkPbnM66DzzkG6ZInj7yZo9qjiVK7-l0sZWCmLY6SI1Q6YF_TzFK5lLvm1MXt7c-YwiMy72Zx5CvD30vgJJQ4EA/360fx360f"], ["category", "sticker"], ["wear", nil], ["available", 1], ["created_at", "2026-04-07 12:00:53.876712"], ["updated_at", "2026-04-07 12:00:53.876712"]]
+  [1m[36mTRANSACTION (0.5ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.1ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "Titan (Holo) | Katowice 2014"], ["description", "A legendary holographic sticker from Katowice 2014."], ["price", 35000.0], ["rarity", "restricted"], ["image_url", "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvFi08_M1F8kgJOssge1JD5g2unnYTVN-NO4q4yCkPbnM66DzzkG6ZInj7yZo9qjiVK7-l0sZWCmLY6SI1Q6YF_TzFK5lLvm1MXt7c-YwiMy72Zx5CvD30vgJJQ4EA/360fx360f"], ["category", "sticker"], ["wear", nil], ["available", 1], ["created_at", "2026-04-07 12:00:53.881259"], ["updated_at", "2026-04-07 12:00:53.881259"]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.1ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "CS:GO Weapon Case"], ["description", "A classic weapon case from the early days of CS:GO."], ["price", 3.0], ["rarity", "milspec"], ["image_url", "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvFi08_M1F8kgJOssge1JD5g2unnYTVN-NO4q4yCkPbnM66DzzkG6ZInj7yZo9qjiVK7-l0sZWCmLY6SI1Q6YF_TzFK5lLvm1MXt7c-YwiMy72Zx5CvD30vgJJQ4EA/360fx360f"], ["category", "case"], ["wear", nil], ["available", 1], ["created_at", "2026-04-07 12:00:53.885199"], ["updated_at", "2026-04-07 12:00:53.885199"]]
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.1ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "Operation Broken Fang Case"], ["description", "A case from the Operation Broken Fang."], ["price", 1.5], ["rarity", "milspec"], ["image_url", "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvFi08_M1F8kgJOssge1JD5g2unnYTVN-NO4q4yCkPbnM66DzzkG6ZInj7yZo9qjiVK7-l0sZWCmLY6SI1Q6YF_TzFK5lLvm1MXt7c-YwiMy72Zx5CvD30vgJJQ4EA/360fx360f"], ["category", "case"], ["wear", nil], ["available", 1], ["created_at", "2026-04-07 12:00:53.889944"], ["updated_at", "2026-04-07 12:00:53.889944"]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.5ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "Revolution Case"], ["description", "The latest case featuring community-designed skins."], ["price", 0.8], ["rarity", "milspec"], ["image_url", "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvFi08_M1F8kgJOssge1JD5g2unnYTVN-NO4q4yCkPbnM66DzzkG6ZInj7yZo9qjiVK7-l0sZWCmLY6SI1Q6YF_TzFK5lLvm1MXt7c-YwiMy72Zx5CvD30vgJJQ4EA/360fx360f"], ["category", "case"], ["wear", nil], ["available", 1], ["created_at", "2026-04-07 12:00:53.893609"], ["updated_at", "2026-04-07 12:00:53.893609"]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.3ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "SSG 08 | Dragonfire"], ["description", "An SSG 08 with a fearsome dragon design."], ["price", 8.5], ["rarity", "covert"], ["image_url", "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvFi08_M1F8kgJOssge1JD5g2unnYTVN-NO4q4yCkPbnM66DzzkG6ZInj7yZo9qjiVK7-l0sZWCmLY6SI1Q6YF_TzFK5lLvm1MXt7c-YwiMy72Zx5CvD30vgJJQ4EA/360fx360f"], ["category", "rifle"], ["wear", "field_tested"], ["available", 1], ["created_at", "2026-04-07 12:00:53.898239"], ["updated_at", "2026-04-07 12:00:53.898239"]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.9ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "CZ75-Auto | Yellow Jacket"], ["description", "A CZ75 with a striking wasp design."], ["price", 3.5], ["rarity", "restricted"], ["image_url", "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvFi08_M1F8kgJOssge1JD5g2unnYTVN-NO4q4yCkPbnM66DzzkG6ZInj7yZo9qjiVK7-l0sZWCmLY6SI1Q6YF_TzFK5lLvm1MXt7c-YwiMy72Zx5CvD30vgJJQ4EA/360fx360f"], ["category", "pistol"], ["wear", "minimal_wear"], ["available", 1], ["created_at", "2026-04-07 12:00:53.903190"], ["updated_at", "2026-04-07 12:00:53.903190"]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.9ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "Negev | Mjölnir"], ["description", "A Negev skin inspired by Thor's hammer."], ["price", 180.0], ["rarity", "classified"], ["image_url", "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvFi08_M1F8kgJOssge1JD5g2unnYTVN-NO4q4yCkPbnM66DzzkG6ZInj7yZo9qjiVK7-l0sZWCmLY6SI1Q6YF_TzFK5lLvm1MXt7c-YwiMy72Zx5CvD30vgJJQ4EA/360fx360f"], ["category", "heavy"], ["wear", "factory_new"], ["available", 1], ["created_at", "2026-04-07 12:00:53.908938"], ["updated_at", "2026-04-07 12:00:53.908938"]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.5ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "R8 Revolver | Fade"], ["description", "An R8 Revolver with a beautiful fade pattern."], ["price", 120.0], ["rarity", "restricted"], ["image_url", "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvFi08_M1F8kgJOssge1JD5g2unnYTVN-NO4q4yCkPbnM66DzzkG6ZInj7yZo9qjiVK7-l0sZWCmLY6SI1Q6YF_TzFK5lLvm1MXt7c-YwiMy72Zx5CvD30vgJJQ4EA/360fx360f"], ["category", "pistol"], ["wear", "factory_new"], ["available", 1], ["created_at", "2026-04-07 12:00:53.914414"], ["updated_at", "2026-04-07 12:00:53.914414"]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.2ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "Sawed-Off | Kraken"], ["description", "A Sawed-Off with a terrifying sea monster design."], ["price", 6.0], ["rarity", "classified"], ["image_url", "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvFi08_M1F8kgJOssge1JD5g2unnYTVN-NO4q4yCkPbnM66DzzkG6ZInj7yZo9qjiVK7-l0sZWCmLY6SI1Q6YF_TzFK5lLvm1MXt7c-YwiMy72Zx5CvD30vgJJQ4EA/360fx360f"], ["category", "heavy"], ["wear", "field_tested"], ["available", 1], ["created_at", "2026-04-07 12:00:53.920049"], ["updated_at", "2026-04-07 12:00:53.920049"]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mProduct Count (0.2ms)[0m  [1m[34mSELECT COUNT(*) FROM "products"[0m
+Started GET "/" for ::1 at 2026-04-07 19:01:01 +0700
+Processing by ProductsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering products/index.html.erb within layouts/application
+  [1m[36mProduct Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "products" WHERE "products"."available" = ? LIMIT ?[0m  [["available", 1], ["LIMIT", 1]]
+  ↳ app/views/products/index.html.erb:47:in '_app_views_products_index_html_erb___601777427_9560'
+  [1m[36mProduct Load (1.0ms)[0m  [1m[34mSELECT "products".* FROM "products" WHERE "products"."available" = ? ORDER BY "products"."created_at" DESC LIMIT ?[0m  [["available", 1], ["LIMIT", 50]]
+  ↳ app/views/products/index.html.erb:49:in '_app_views_products_index_html_erb___601777427_9560'
+  Rendered products/index.html.erb within layouts/application (Duration: 421.5ms | Allocations: 30712)
+  Rendered layouts/_navbar.html.erb (Duration: 0.9ms | Allocations: 100)
+  Rendered layouts/_footer.html.erb (Duration: 3.6ms | Allocations: 90)
+  Rendered layout layouts/application.html.erb (Duration: 443.5ms | Allocations: 31861)
+Completed 200 OK in 460ms (Views: 443.2ms | ActiveRecord: 2.1ms | Allocations: 32171)
+
+
+Started GET "/" for ::1 at 2026-04-07 19:03:10 +0700
+Processing by ProductsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering products/index.html.erb within layouts/application
+  [1m[36mProduct Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "products" WHERE "products"."available" = ? LIMIT ?[0m  [["available", 1], ["LIMIT", 1]]
+  ↳ app/views/products/index.html.erb:47:in '_app_views_products_index_html_erb___601777427_9560'
+  [1m[36mProduct Load (3.4ms)[0m  [1m[34mSELECT "products".* FROM "products" WHERE "products"."available" = ? ORDER BY "products"."created_at" DESC LIMIT ?[0m  [["available", 1], ["LIMIT", 50]]
+  ↳ app/views/products/index.html.erb:49:in '_app_views_products_index_html_erb___601777427_9560'
+  Rendered products/index.html.erb within layouts/application (Duration: 193.6ms | Allocations: 16482)
+  Rendered layouts/_navbar.html.erb (Duration: 0.3ms | Allocations: 100)
+  Rendered layouts/_footer.html.erb (Duration: 0.5ms | Allocations: 90)
+  Rendered layout layouts/application.html.erb (Duration: 232.2ms | Allocations: 17634)
+Completed 200 OK in 249ms (Views: 233.3ms | ActiveRecord: 3.6ms | Allocations: 17944)
+
+
+Started GET "/" for ::1 at 2026-04-07 19:03:36 +0700
+Processing by ProductsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering products/index.html.erb within layouts/application
+  [1m[36mProduct Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "products" WHERE "products"."available" = ? LIMIT ?[0m  [["available", 1], ["LIMIT", 1]]
+  ↳ app/views/products/index.html.erb:47:in '_app_views_products_index_html_erb___601777427_9560'
+  [1m[36mProduct Load (0.8ms)[0m  [1m[34mSELECT "products".* FROM "products" WHERE "products"."available" = ? ORDER BY "products"."created_at" DESC LIMIT ?[0m  [["available", 1], ["LIMIT", 50]]
+  ↳ app/views/products/index.html.erb:49:in '_app_views_products_index_html_erb___601777427_9560'
+  Rendered products/index.html.erb within layouts/application (Duration: 63.8ms | Allocations: 16476)
+  Rendered layouts/_navbar.html.erb (Duration: 0.4ms | Allocations: 100)
+  Rendered layouts/_footer.html.erb (Duration: 0.8ms | Allocations: 90)
+  Rendered layout layouts/application.html.erb (Duration: 84.9ms | Allocations: 17624)
+Completed 200 OK in 105ms (Views: 86.9ms | ActiveRecord: 1.0ms | Allocations: 17924)
+
+
+Started GET "/" for ::1 at 2026-04-07 19:03:40 +0700
+Processing by ProductsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering products/index.html.erb within layouts/application
+  [1m[36mProduct Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "products" WHERE "products"."available" = ? LIMIT ?[0m  [["available", 1], ["LIMIT", 1]]
+  ↳ app/views/products/index.html.erb:47:in '_app_views_products_index_html_erb___601777427_9560'
+  [1m[36mProduct Load (0.5ms)[0m  [1m[34mSELECT "products".* FROM "products" WHERE "products"."available" = ? ORDER BY "products"."created_at" DESC LIMIT ?[0m  [["available", 1], ["LIMIT", 50]]
+  ↳ app/views/products/index.html.erb:49:in '_app_views_products_index_html_erb___601777427_9560'
+  Rendered products/index.html.erb within layouts/application (Duration: 66.6ms | Allocations: 16496)
+  Rendered layouts/_navbar.html.erb (Duration: 1.4ms | Allocations: 100)
+  Rendered layouts/_footer.html.erb (Duration: 0.5ms | Allocations: 90)
+  Rendered layout layouts/application.html.erb (Duration: 97.1ms | Allocations: 17645)
+Completed 200 OK in 117ms (Views: 100.0ms | ActiveRecord: 0.6ms | Allocations: 17955)
+
+
+Started POST "/wishlist/add/34" for ::1 at 2026-04-07 19:03:44 +0700
+Processing by WishlistsController#add as HTML
+  Parameters: {"authenticity_token" => "[FILTERED]", "product_id" => "34"}
+Redirected to http://localhost:3000/login
+Filter chain halted as :require_login rendered or redirected
+Completed 302 Found in 20ms (ActiveRecord: 0.0ms | Allocations: 611)
+
+
+Started GET "/login" for ::1 at 2026-04-07 19:03:45 +0700
+Processing by SessionsController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering sessions/new.html.erb within layouts/application
+  Rendered sessions/new.html.erb within layouts/application (Duration: 4.1ms | Allocations: 2063)
+  Rendered layouts/_navbar.html.erb (Duration: 1.7ms | Allocations: 100)
+  Rendered layouts/_footer.html.erb (Duration: 0.4ms | Allocations: 90)
+  Rendered layout layouts/application.html.erb (Duration: 21.7ms | Allocations: 3219)
+Completed 200 OK in 31ms (Views: 23.2ms | ActiveRecord: 0.0ms | Allocations: 3671)
+
+
+Started GET "/products" for ::1 at 2026-04-07 19:03:47 +0700
+Processing by ProductsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering products/index.html.erb within layouts/application
+  [1m[36mProduct Exists? (1.4ms)[0m  [1m[34mSELECT 1 AS one FROM "products" WHERE "products"."available" = ? LIMIT ?[0m  [["available", 1], ["LIMIT", 1]]
+  ↳ app/views/products/index.html.erb:47:in '_app_views_products_index_html_erb___601777427_9560'
+  [1m[36mProduct Load (0.5ms)[0m  [1m[34mSELECT "products".* FROM "products" WHERE "products"."available" = ? ORDER BY "products"."created_at" DESC LIMIT ?[0m  [["available", 1], ["LIMIT", 50]]
+  ↳ app/views/products/index.html.erb:49:in '_app_views_products_index_html_erb___601777427_9560'
+  Rendered products/index.html.erb within layouts/application (Duration: 110.5ms | Allocations: 16471)
+  Rendered layouts/_navbar.html.erb (Duration: 0.4ms | Allocations: 100)
+  Rendered layouts/_footer.html.erb (Duration: 0.4ms | Allocations: 90)
+  Rendered layout layouts/application.html.erb (Duration: 139.4ms | Allocations: 17619)
+Completed 200 OK in 168ms (Views: 151.5ms | ActiveRecord: 1.9ms | Allocations: 17919)
+
+
+Started GET "/products/34" for ::1 at 2026-04-07 19:04:00 +0700
+Processing by ProductsController#show as HTML
+  Parameters: {"id" => "34"}
+  [1m[36mProduct Load (0.2ms)[0m  [1m[34mSELECT "products".* FROM "products" WHERE "products"."id" = ? LIMIT ?[0m  [["id", 34], ["LIMIT", 1]]
+  ↳ app/controllers/products_controller.rb:30:in 'ProductsController#show'
+  Rendering layout layouts/application.html.erb
+  Rendering products/show.html.erb within layouts/application
+  [1m[36mProduct Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "products" WHERE "products"."available" = ? AND "products"."category" = ? AND "products"."id" != ? LIMIT ?[0m  [["available", 1], ["category", "heavy"], ["id", 34], ["LIMIT", 1]]
+  ↳ app/views/products/show.html.erb:45:in '_app_views_products_show_html_erb___295489251_10272'
+  [1m[36mProduct Load (0.4ms)[0m  [1m[34mSELECT "products".* FROM "products" WHERE "products"."available" = ? AND "products"."category" = ? AND "products"."id" != ? LIMIT ?[0m  [["available", 1], ["category", "heavy"], ["id", 34], ["LIMIT", 4]]
+  ↳ app/views/products/show.html.erb:49:in '_app_views_products_show_html_erb___295489251_10272'
+  Rendered products/show.html.erb within layouts/application (Duration: 21.9ms | Allocations: 2112)
+  Rendered layouts/_navbar.html.erb (Duration: 0.6ms | Allocations: 100)
+  Rendered layouts/_footer.html.erb (Duration: 0.4ms | Allocations: 90)
+  Rendered layout layouts/application.html.erb (Duration: 47.5ms | Allocations: 3260)
+Completed 200 OK in 99ms (Views: 50.6ms | ActiveRecord: 0.8ms | Allocations: 4968)
+
+
+Started GET "/products/34" for ::1 at 2026-04-07 19:04:43 +0700
+Processing by ProductsController#show as HTML
+  Parameters: {"id" => "34"}
+  [1m[36mProduct Load (0.2ms)[0m  [1m[34mSELECT "products".* FROM "products" WHERE "products"."id" = ? LIMIT ?[0m  [["id", 34], ["LIMIT", 1]]
+  ↳ app/controllers/products_controller.rb:30:in 'ProductsController#show'
+  Rendering layout layouts/application.html.erb
+  Rendering products/show.html.erb within layouts/application
+  [1m[36mProduct Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "products" WHERE "products"."available" = ? AND "products"."category" = ? AND "products"."id" != ? LIMIT ?[0m  [["available", 1], ["category", "heavy"], ["id", 34], ["LIMIT", 1]]
+  ↳ app/views/products/show.html.erb:45:in '_app_views_products_show_html_erb___295489251_10272'
+  [1m[36mProduct Load (0.2ms)[0m  [1m[34mSELECT "products".* FROM "products" WHERE "products"."available" = ? AND "products"."category" = ? AND "products"."id" != ? LIMIT ?[0m  [["available", 1], ["category", "heavy"], ["id", 34], ["LIMIT", 4]]
+  ↳ app/views/products/show.html.erb:49:in '_app_views_products_show_html_erb___295489251_10272'
+  Rendered products/show.html.erb within layouts/application (Duration: 22.6ms | Allocations: 1484)
+  Rendered layouts/_navbar.html.erb (Duration: 0.4ms | Allocations: 100)
+  Rendered layouts/_footer.html.erb (Duration: 0.4ms | Allocations: 90)
+  Rendered layout layouts/application.html.erb (Duration: 44.9ms | Allocations: 2633)
+Completed 200 OK in 78ms (Views: 49.8ms | ActiveRecord: 0.6ms | Allocations: 3549)
+
+
+Started GET "/" for ::1 at 2026-04-07 19:04:45 +0700
+Processing by ProductsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering products/index.html.erb within layouts/application
+  [1m[36mProduct Exists? (1.3ms)[0m  [1m[34mSELECT 1 AS one FROM "products" WHERE "products"."available" = ? LIMIT ?[0m  [["available", 1], ["LIMIT", 1]]
+  ↳ app/views/products/index.html.erb:47:in '_app_views_products_index_html_erb___601777427_9560'
+  [1m[36mProduct Load (0.5ms)[0m  [1m[34mSELECT "products".* FROM "products" WHERE "products"."available" = ? ORDER BY "products"."created_at" DESC LIMIT ?[0m  [["available", 1], ["LIMIT", 50]]
+  ↳ app/views/products/index.html.erb:49:in '_app_views_products_index_html_erb___601777427_9560'
+  Rendered products/index.html.erb within layouts/application (Duration: 103.5ms | Allocations: 16493)
+  Rendered layouts/_navbar.html.erb (Duration: 0.5ms | Allocations: 100)
+  Rendered layouts/_footer.html.erb (Duration: 2.5ms | Allocations: 90)
+  Rendered layout layouts/application.html.erb (Duration: 143.4ms | Allocations: 17642)
+Completed 200 OK in 162ms (Views: 148.9ms | ActiveRecord: 1.8ms | Allocations: 17952)
+
+
+Started GET "/" for ::1 at 2026-04-07 19:04:51 +0700
+Processing by ProductsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering products/index.html.erb within layouts/application
+  [1m[36mProduct Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "products" WHERE "products"."available" = ? LIMIT ?[0m  [["available", 1], ["LIMIT", 1]]
+  ↳ app/views/products/index.html.erb:47:in '_app_views_products_index_html_erb___601777427_9560'
+  [1m[36mProduct Load (0.6ms)[0m  [1m[34mSELECT "products".* FROM "products" WHERE "products"."available" = ? ORDER BY "products"."created_at" DESC LIMIT ?[0m  [["available", 1], ["LIMIT", 50]]
+  ↳ app/views/products/index.html.erb:49:in '_app_views_products_index_html_erb___601777427_9560'
+  Rendered products/index.html.erb within layouts/application (Duration: 53.9ms | Allocations: 16464)
+  Rendered layouts/_navbar.html.erb (Duration: 0.6ms | Allocations: 100)
+  Rendered layouts/_footer.html.erb (Duration: 0.3ms | Allocations: 90)
+  Rendered layout layouts/application.html.erb (Duration: 70.4ms | Allocations: 17612)
+Completed 200 OK in 86ms (Views: 72.4ms | ActiveRecord: 0.8ms | Allocations: 17912)
+
+
+  [1m[36mActiveRecord::SchemaMigration Load (0.2ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[36mProduct Load (0.3ms)[0m  [1m[34mSELECT "products".* FROM "products"[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mCartItem Load (0.1ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."product_id" = ?[0m  [["product_id", 1]]
+  [1m[36mOrderItem Load (0.1ms)[0m  [1m[34mSELECT "order_items".* FROM "order_items" WHERE "order_items"."product_id" = ?[0m  [["product_id", 1]]
+  [1m[36mWishlist Load (0.1ms)[0m  [1m[34mSELECT "wishlists".* FROM "wishlists" WHERE "wishlists"."product_id" = ?[0m  [["product_id", 1]]
+  [1m[36mProduct Destroy (0.4ms)[0m  [1m[31mDELETE FROM "products" WHERE "products"."id" = ?[0m  [["id", 1]]
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mCartItem Load (0.8ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."product_id" = ?[0m  [["product_id", 2]]
+  [1m[36mOrderItem Load (0.1ms)[0m  [1m[34mSELECT "order_items".* FROM "order_items" WHERE "order_items"."product_id" = ?[0m  [["product_id", 2]]
+  [1m[36mWishlist Load (0.1ms)[0m  [1m[34mSELECT "wishlists".* FROM "wishlists" WHERE "wishlists"."product_id" = ?[0m  [["product_id", 2]]
+  [1m[36mProduct Destroy (0.3ms)[0m  [1m[31mDELETE FROM "products" WHERE "products"."id" = ?[0m  [["id", 2]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mCartItem Load (2.0ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."product_id" = ?[0m  [["product_id", 3]]
+  [1m[36mOrderItem Load (0.1ms)[0m  [1m[34mSELECT "order_items".* FROM "order_items" WHERE "order_items"."product_id" = ?[0m  [["product_id", 3]]
+  [1m[36mWishlist Load (0.1ms)[0m  [1m[34mSELECT "wishlists".* FROM "wishlists" WHERE "wishlists"."product_id" = ?[0m  [["product_id", 3]]
+  [1m[36mProduct Destroy (0.2ms)[0m  [1m[31mDELETE FROM "products" WHERE "products"."id" = ?[0m  [["id", 3]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mCartItem Load (1.3ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."product_id" = ?[0m  [["product_id", 4]]
+  [1m[36mOrderItem Load (0.1ms)[0m  [1m[34mSELECT "order_items".* FROM "order_items" WHERE "order_items"."product_id" = ?[0m  [["product_id", 4]]
+  [1m[36mWishlist Load (0.0ms)[0m  [1m[34mSELECT "wishlists".* FROM "wishlists" WHERE "wishlists"."product_id" = ?[0m  [["product_id", 4]]
+  [1m[36mProduct Destroy (0.2ms)[0m  [1m[31mDELETE FROM "products" WHERE "products"."id" = ?[0m  [["id", 4]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mCartItem Load (0.9ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."product_id" = ?[0m  [["product_id", 5]]
+  [1m[36mOrderItem Load (0.1ms)[0m  [1m[34mSELECT "order_items".* FROM "order_items" WHERE "order_items"."product_id" = ?[0m  [["product_id", 5]]
+  [1m[36mWishlist Load (0.0ms)[0m  [1m[34mSELECT "wishlists".* FROM "wishlists" WHERE "wishlists"."product_id" = ?[0m  [["product_id", 5]]
+  [1m[36mProduct Destroy (0.1ms)[0m  [1m[31mDELETE FROM "products" WHERE "products"."id" = ?[0m  [["id", 5]]
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mCartItem Load (0.9ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."product_id" = ?[0m  [["product_id", 6]]
+  [1m[36mOrderItem Load (0.0ms)[0m  [1m[34mSELECT "order_items".* FROM "order_items" WHERE "order_items"."product_id" = ?[0m  [["product_id", 6]]
+  [1m[36mWishlist Load (0.0ms)[0m  [1m[34mSELECT "wishlists".* FROM "wishlists" WHERE "wishlists"."product_id" = ?[0m  [["product_id", 6]]
+  [1m[36mProduct Destroy (0.1ms)[0m  [1m[31mDELETE FROM "products" WHERE "products"."id" = ?[0m  [["id", 6]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mCartItem Load (0.6ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."product_id" = ?[0m  [["product_id", 7]]
+  [1m[36mOrderItem Load (0.0ms)[0m  [1m[34mSELECT "order_items".* FROM "order_items" WHERE "order_items"."product_id" = ?[0m  [["product_id", 7]]
+  [1m[36mWishlist Load (0.1ms)[0m  [1m[34mSELECT "wishlists".* FROM "wishlists" WHERE "wishlists"."product_id" = ?[0m  [["product_id", 7]]
+  [1m[36mProduct Destroy (0.1ms)[0m  [1m[31mDELETE FROM "products" WHERE "products"."id" = ?[0m  [["id", 7]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mCartItem Load (3.6ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."product_id" = ?[0m  [["product_id", 8]]
+  [1m[36mOrderItem Load (0.2ms)[0m  [1m[34mSELECT "order_items".* FROM "order_items" WHERE "order_items"."product_id" = ?[0m  [["product_id", 8]]
+  [1m[36mWishlist Load (0.1ms)[0m  [1m[34mSELECT "wishlists".* FROM "wishlists" WHERE "wishlists"."product_id" = ?[0m  [["product_id", 8]]
+  [1m[36mProduct Destroy (0.2ms)[0m  [1m[31mDELETE FROM "products" WHERE "products"."id" = ?[0m  [["id", 8]]
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mCartItem Load (3.8ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."product_id" = ?[0m  [["product_id", 9]]
+  [1m[36mOrderItem Load (0.1ms)[0m  [1m[34mSELECT "order_items".* FROM "order_items" WHERE "order_items"."product_id" = ?[0m  [["product_id", 9]]
+  [1m[36mWishlist Load (0.1ms)[0m  [1m[34mSELECT "wishlists".* FROM "wishlists" WHERE "wishlists"."product_id" = ?[0m  [["product_id", 9]]
+  [1m[36mProduct Destroy (0.2ms)[0m  [1m[31mDELETE FROM "products" WHERE "products"."id" = ?[0m  [["id", 9]]
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mCartItem Load (20.6ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."product_id" = ?[0m  [["product_id", 10]]
+  [1m[36mOrderItem Load (0.0ms)[0m  [1m[34mSELECT "order_items".* FROM "order_items" WHERE "order_items"."product_id" = ?[0m  [["product_id", 10]]
+  [1m[36mWishlist Load (0.0ms)[0m  [1m[34mSELECT "wishlists".* FROM "wishlists" WHERE "wishlists"."product_id" = ?[0m  [["product_id", 10]]
+  [1m[36mProduct Destroy (0.1ms)[0m  [1m[31mDELETE FROM "products" WHERE "products"."id" = ?[0m  [["id", 10]]
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mCartItem Load (2.2ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."product_id" = ?[0m  [["product_id", 11]]
+  [1m[36mOrderItem Load (0.1ms)[0m  [1m[34mSELECT "order_items".* FROM "order_items" WHERE "order_items"."product_id" = ?[0m  [["product_id", 11]]
+  [1m[36mWishlist Load (0.1ms)[0m  [1m[34mSELECT "wishlists".* FROM "wishlists" WHERE "wishlists"."product_id" = ?[0m  [["product_id", 11]]
+  [1m[36mProduct Destroy (1.6ms)[0m  [1m[31mDELETE FROM "products" WHERE "products"."id" = ?[0m  [["id", 11]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mCartItem Load (1.5ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."product_id" = ?[0m  [["product_id", 12]]
+  [1m[36mOrderItem Load (0.0ms)[0m  [1m[34mSELECT "order_items".* FROM "order_items" WHERE "order_items"."product_id" = ?[0m  [["product_id", 12]]
+  [1m[36mWishlist Load (0.0ms)[0m  [1m[34mSELECT "wishlists".* FROM "wishlists" WHERE "wishlists"."product_id" = ?[0m  [["product_id", 12]]
+  [1m[36mProduct Destroy (0.1ms)[0m  [1m[31mDELETE FROM "products" WHERE "products"."id" = ?[0m  [["id", 12]]
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mCartItem Load (0.8ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."product_id" = ?[0m  [["product_id", 13]]
+  [1m[36mOrderItem Load (0.0ms)[0m  [1m[34mSELECT "order_items".* FROM "order_items" WHERE "order_items"."product_id" = ?[0m  [["product_id", 13]]
+  [1m[36mWishlist Load (0.1ms)[0m  [1m[34mSELECT "wishlists".* FROM "wishlists" WHERE "wishlists"."product_id" = ?[0m  [["product_id", 13]]
+  [1m[36mProduct Destroy (0.3ms)[0m  [1m[31mDELETE FROM "products" WHERE "products"."id" = ?[0m  [["id", 13]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mCartItem Load (1.7ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."product_id" = ?[0m  [["product_id", 14]]
+  [1m[36mOrderItem Load (0.1ms)[0m  [1m[34mSELECT "order_items".* FROM "order_items" WHERE "order_items"."product_id" = ?[0m  [["product_id", 14]]
+  [1m[36mWishlist Load (0.1ms)[0m  [1m[34mSELECT "wishlists".* FROM "wishlists" WHERE "wishlists"."product_id" = ?[0m  [["product_id", 14]]
+  [1m[36mProduct Destroy (0.1ms)[0m  [1m[31mDELETE FROM "products" WHERE "products"."id" = ?[0m  [["id", 14]]
+  [1m[36mTRANSACTION (0.4ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mCartItem Load (2.0ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."product_id" = ?[0m  [["product_id", 15]]
+  [1m[36mOrderItem Load (0.1ms)[0m  [1m[34mSELECT "order_items".* FROM "order_items" WHERE "order_items"."product_id" = ?[0m  [["product_id", 15]]
+  [1m[36mWishlist Load (0.1ms)[0m  [1m[34mSELECT "wishlists".* FROM "wishlists" WHERE "wishlists"."product_id" = ?[0m  [["product_id", 15]]
+  [1m[36mProduct Destroy (0.2ms)[0m  [1m[31mDELETE FROM "products" WHERE "products"."id" = ?[0m  [["id", 15]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mCartItem Load (1.6ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."product_id" = ?[0m  [["product_id", 16]]
+  [1m[36mOrderItem Load (0.0ms)[0m  [1m[34mSELECT "order_items".* FROM "order_items" WHERE "order_items"."product_id" = ?[0m  [["product_id", 16]]
+  [1m[36mWishlist Load (0.0ms)[0m  [1m[34mSELECT "wishlists".* FROM "wishlists" WHERE "wishlists"."product_id" = ?[0m  [["product_id", 16]]
+  [1m[36mProduct Destroy (0.4ms)[0m  [1m[31mDELETE FROM "products" WHERE "products"."id" = ?[0m  [["id", 16]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mCartItem Load (0.8ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."product_id" = ?[0m  [["product_id", 17]]
+  [1m[36mOrderItem Load (0.0ms)[0m  [1m[34mSELECT "order_items".* FROM "order_items" WHERE "order_items"."product_id" = ?[0m  [["product_id", 17]]
+  [1m[36mWishlist Load (0.1ms)[0m  [1m[34mSELECT "wishlists".* FROM "wishlists" WHERE "wishlists"."product_id" = ?[0m  [["product_id", 17]]
+  [1m[36mProduct Destroy (0.1ms)[0m  [1m[31mDELETE FROM "products" WHERE "products"."id" = ?[0m  [["id", 17]]
+  [1m[36mTRANSACTION (0.4ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mCartItem Load (1.0ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."product_id" = ?[0m  [["product_id", 18]]
+  [1m[36mOrderItem Load (0.1ms)[0m  [1m[34mSELECT "order_items".* FROM "order_items" WHERE "order_items"."product_id" = ?[0m  [["product_id", 18]]
+  [1m[36mWishlist Load (0.0ms)[0m  [1m[34mSELECT "wishlists".* FROM "wishlists" WHERE "wishlists"."product_id" = ?[0m  [["product_id", 18]]
+  [1m[36mProduct Destroy (0.1ms)[0m  [1m[31mDELETE FROM "products" WHERE "products"."id" = ?[0m  [["id", 18]]
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mCartItem Load (1.0ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."product_id" = ?[0m  [["product_id", 19]]
+  [1m[36mOrderItem Load (0.0ms)[0m  [1m[34mSELECT "order_items".* FROM "order_items" WHERE "order_items"."product_id" = ?[0m  [["product_id", 19]]
+  [1m[36mWishlist Load (0.0ms)[0m  [1m[34mSELECT "wishlists".* FROM "wishlists" WHERE "wishlists"."product_id" = ?[0m  [["product_id", 19]]
+  [1m[36mProduct Destroy (0.1ms)[0m  [1m[31mDELETE FROM "products" WHERE "products"."id" = ?[0m  [["id", 19]]
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mCartItem Load (1.3ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."product_id" = ?[0m  [["product_id", 20]]
+  [1m[36mOrderItem Load (0.0ms)[0m  [1m[34mSELECT "order_items".* FROM "order_items" WHERE "order_items"."product_id" = ?[0m  [["product_id", 20]]
+  [1m[36mWishlist Load (0.0ms)[0m  [1m[34mSELECT "wishlists".* FROM "wishlists" WHERE "wishlists"."product_id" = ?[0m  [["product_id", 20]]
+  [1m[36mProduct Destroy (0.1ms)[0m  [1m[31mDELETE FROM "products" WHERE "products"."id" = ?[0m  [["id", 20]]
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mCartItem Load (1.7ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."product_id" = ?[0m  [["product_id", 21]]
+  [1m[36mOrderItem Load (0.1ms)[0m  [1m[34mSELECT "order_items".* FROM "order_items" WHERE "order_items"."product_id" = ?[0m  [["product_id", 21]]
+  [1m[36mWishlist Load (0.1ms)[0m  [1m[34mSELECT "wishlists".* FROM "wishlists" WHERE "wishlists"."product_id" = ?[0m  [["product_id", 21]]
+  [1m[36mProduct Destroy (0.2ms)[0m  [1m[31mDELETE FROM "products" WHERE "products"."id" = ?[0m  [["id", 21]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mCartItem Load (1.0ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."product_id" = ?[0m  [["product_id", 22]]
+  [1m[36mOrderItem Load (0.1ms)[0m  [1m[34mSELECT "order_items".* FROM "order_items" WHERE "order_items"."product_id" = ?[0m  [["product_id", 22]]
+  [1m[36mWishlist Load (0.0ms)[0m  [1m[34mSELECT "wishlists".* FROM "wishlists" WHERE "wishlists"."product_id" = ?[0m  [["product_id", 22]]
+  [1m[36mProduct Destroy (0.1ms)[0m  [1m[31mDELETE FROM "products" WHERE "products"."id" = ?[0m  [["id", 22]]
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mCartItem Load (1.5ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."product_id" = ?[0m  [["product_id", 23]]
+  [1m[36mOrderItem Load (0.1ms)[0m  [1m[34mSELECT "order_items".* FROM "order_items" WHERE "order_items"."product_id" = ?[0m  [["product_id", 23]]
+  [1m[36mWishlist Load (0.1ms)[0m  [1m[34mSELECT "wishlists".* FROM "wishlists" WHERE "wishlists"."product_id" = ?[0m  [["product_id", 23]]
+  [1m[36mProduct Destroy (0.1ms)[0m  [1m[31mDELETE FROM "products" WHERE "products"."id" = ?[0m  [["id", 23]]
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mCartItem Load (1.5ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."product_id" = ?[0m  [["product_id", 24]]
+  [1m[36mOrderItem Load (0.0ms)[0m  [1m[34mSELECT "order_items".* FROM "order_items" WHERE "order_items"."product_id" = ?[0m  [["product_id", 24]]
+  [1m[36mWishlist Load (0.0ms)[0m  [1m[34mSELECT "wishlists".* FROM "wishlists" WHERE "wishlists"."product_id" = ?[0m  [["product_id", 24]]
+  [1m[36mProduct Destroy (0.1ms)[0m  [1m[31mDELETE FROM "products" WHERE "products"."id" = ?[0m  [["id", 24]]
+  [1m[36mTRANSACTION (0.4ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mCartItem Load (1.1ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."product_id" = ?[0m  [["product_id", 25]]
+  [1m[36mOrderItem Load (0.0ms)[0m  [1m[34mSELECT "order_items".* FROM "order_items" WHERE "order_items"."product_id" = ?[0m  [["product_id", 25]]
+  [1m[36mWishlist Load (0.1ms)[0m  [1m[34mSELECT "wishlists".* FROM "wishlists" WHERE "wishlists"."product_id" = ?[0m  [["product_id", 25]]
+  [1m[36mProduct Destroy (0.3ms)[0m  [1m[31mDELETE FROM "products" WHERE "products"."id" = ?[0m  [["id", 25]]
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mCartItem Load (1.1ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."product_id" = ?[0m  [["product_id", 26]]
+  [1m[36mOrderItem Load (0.0ms)[0m  [1m[34mSELECT "order_items".* FROM "order_items" WHERE "order_items"."product_id" = ?[0m  [["product_id", 26]]
+  [1m[36mWishlist Load (0.0ms)[0m  [1m[34mSELECT "wishlists".* FROM "wishlists" WHERE "wishlists"."product_id" = ?[0m  [["product_id", 26]]
+  [1m[36mProduct Destroy (0.1ms)[0m  [1m[31mDELETE FROM "products" WHERE "products"."id" = ?[0m  [["id", 26]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mCartItem Load (0.8ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."product_id" = ?[0m  [["product_id", 27]]
+  [1m[36mOrderItem Load (0.1ms)[0m  [1m[34mSELECT "order_items".* FROM "order_items" WHERE "order_items"."product_id" = ?[0m  [["product_id", 27]]
+  [1m[36mWishlist Load (0.1ms)[0m  [1m[34mSELECT "wishlists".* FROM "wishlists" WHERE "wishlists"."product_id" = ?[0m  [["product_id", 27]]
+  [1m[36mProduct Destroy (0.3ms)[0m  [1m[31mDELETE FROM "products" WHERE "products"."id" = ?[0m  [["id", 27]]
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mCartItem Load (2.3ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."product_id" = ?[0m  [["product_id", 28]]
+  [1m[36mOrderItem Load (0.1ms)[0m  [1m[34mSELECT "order_items".* FROM "order_items" WHERE "order_items"."product_id" = ?[0m  [["product_id", 28]]
+  [1m[36mWishlist Load (0.1ms)[0m  [1m[34mSELECT "wishlists".* FROM "wishlists" WHERE "wishlists"."product_id" = ?[0m  [["product_id", 28]]
+  [1m[36mProduct Destroy (0.4ms)[0m  [1m[31mDELETE FROM "products" WHERE "products"."id" = ?[0m  [["id", 28]]
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mCartItem Load (1.8ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."product_id" = ?[0m  [["product_id", 29]]
+  [1m[36mOrderItem Load (0.0ms)[0m  [1m[34mSELECT "order_items".* FROM "order_items" WHERE "order_items"."product_id" = ?[0m  [["product_id", 29]]
+  [1m[36mWishlist Load (0.0ms)[0m  [1m[34mSELECT "wishlists".* FROM "wishlists" WHERE "wishlists"."product_id" = ?[0m  [["product_id", 29]]
+  [1m[36mProduct Destroy (0.1ms)[0m  [1m[31mDELETE FROM "products" WHERE "products"."id" = ?[0m  [["id", 29]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mCartItem Load (1.7ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."product_id" = ?[0m  [["product_id", 30]]
+  [1m[36mOrderItem Load (0.0ms)[0m  [1m[34mSELECT "order_items".* FROM "order_items" WHERE "order_items"."product_id" = ?[0m  [["product_id", 30]]
+  [1m[36mWishlist Load (0.0ms)[0m  [1m[34mSELECT "wishlists".* FROM "wishlists" WHERE "wishlists"."product_id" = ?[0m  [["product_id", 30]]
+  [1m[36mProduct Destroy (0.2ms)[0m  [1m[31mDELETE FROM "products" WHERE "products"."id" = ?[0m  [["id", 30]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mCartItem Load (1.5ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."product_id" = ?[0m  [["product_id", 31]]
+  [1m[36mOrderItem Load (0.0ms)[0m  [1m[34mSELECT "order_items".* FROM "order_items" WHERE "order_items"."product_id" = ?[0m  [["product_id", 31]]
+  [1m[36mWishlist Load (0.0ms)[0m  [1m[34mSELECT "wishlists".* FROM "wishlists" WHERE "wishlists"."product_id" = ?[0m  [["product_id", 31]]
+  [1m[36mProduct Destroy (0.1ms)[0m  [1m[31mDELETE FROM "products" WHERE "products"."id" = ?[0m  [["id", 31]]
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mCartItem Load (0.7ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."product_id" = ?[0m  [["product_id", 32]]
+  [1m[36mOrderItem Load (0.0ms)[0m  [1m[34mSELECT "order_items".* FROM "order_items" WHERE "order_items"."product_id" = ?[0m  [["product_id", 32]]
+  [1m[36mWishlist Load (0.0ms)[0m  [1m[34mSELECT "wishlists".* FROM "wishlists" WHERE "wishlists"."product_id" = ?[0m  [["product_id", 32]]
+  [1m[36mProduct Destroy (0.1ms)[0m  [1m[31mDELETE FROM "products" WHERE "products"."id" = ?[0m  [["id", 32]]
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mCartItem Load (0.7ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."product_id" = ?[0m  [["product_id", 33]]
+  [1m[36mOrderItem Load (0.0ms)[0m  [1m[34mSELECT "order_items".* FROM "order_items" WHERE "order_items"."product_id" = ?[0m  [["product_id", 33]]
+  [1m[36mWishlist Load (0.0ms)[0m  [1m[34mSELECT "wishlists".* FROM "wishlists" WHERE "wishlists"."product_id" = ?[0m  [["product_id", 33]]
+  [1m[36mProduct Destroy (0.1ms)[0m  [1m[31mDELETE FROM "products" WHERE "products"."id" = ?[0m  [["id", 33]]
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mCartItem Load (0.7ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."product_id" = ?[0m  [["product_id", 34]]
+  [1m[36mOrderItem Load (0.0ms)[0m  [1m[34mSELECT "order_items".* FROM "order_items" WHERE "order_items"."product_id" = ?[0m  [["product_id", 34]]
+  [1m[36mWishlist Load (0.0ms)[0m  [1m[34mSELECT "wishlists".* FROM "wishlists" WHERE "wishlists"."product_id" = ?[0m  [["product_id", 34]]
+  [1m[36mProduct Destroy (0.1ms)[0m  [1m[31mDELETE FROM "products" WHERE "products"."id" = ?[0m  [["id", 34]]
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mUser Load (0.1ms)[0m  [1m[34mSELECT "users".* FROM "users"[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.3ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "★ Karambit | Fade"], ["description", "A deadly karambit with a beautiful fade pattern."], ["price", 850.0], ["rarity", "knives"], ["image_url", "https://placehold.co/400x300/e74c3c/ffffff?text=Karambit+Fade"], ["category", "knife"], ["wear", "factory_new"], ["available", 1], ["created_at", "2026-04-07 12:05:11.556313"], ["updated_at", "2026-04-07 12:05:11.556313"]]
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (0.8ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "★ Butterfly Knife | Doppler (Ruby)"], ["description", "A butterfly knife with a stunning ruby doppler pattern."], ["price", 1200.0], ["rarity", "knives"], ["image_url", "https://placehold.co/400x300/c0392b/ffffff?text=Butterfly+Ruby"], ["category", "knife"], ["wear", "factory_new"], ["available", 1], ["created_at", "2026-04-07 12:05:11.560689"], ["updated_at", "2026-04-07 12:05:11.560689"]]
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (0.8ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "★ M9 Bayonet | Crimson Web"], ["description", "An M9 bayonet with a distinctive crimson web pattern."], ["price", 650.0], ["rarity", "knives"], ["image_url", "https://placehold.co/400x300/8e44ad/ffffff?text=M9+Crimson"], ["category", "knife"], ["wear", "minimal_wear"], ["available", 1], ["created_at", "2026-04-07 12:05:11.563781"], ["updated_at", "2026-04-07 12:05:11.563781"]]
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (2.4ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "AK-47 | Fire Serpent"], ["description", "A legendary AK-47 skin with a fire serpent design."], ["price", 450.0], ["rarity", "covert"], ["image_url", "https://placehold.co/400x300/d35400/ffffff?text=AK+Fire+Serpent"], ["category", "rifle"], ["wear", "field_tested"], ["available", 1], ["created_at", "2026-04-07 12:05:11.574262"], ["updated_at", "2026-04-07 12:05:11.574262"]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (2.4ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "M4A4 | Howl"], ["description", "A contraband M4A4 skin featuring a howling wolf."], ["price", 1800.0], ["rarity", "covert"], ["image_url", "https://placehold.co/400x300/e74c3c/ffffff?text=M4A4+Howl"], ["category", "rifle"], ["wear", "factory_new"], ["available", 1], ["created_at", "2026-04-07 12:05:11.583448"], ["updated_at", "2026-04-07 12:05:11.583448"]]
+  [1m[36mTRANSACTION (0.5ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (3.7ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "AWP | Dragon Lore"], ["description", "The most iconic AWP skin featuring a majestic dragon."], ["price", 2500.0], ["rarity", "covert"], ["image_url", "https://placehold.co/400x300/f1c40f/000000?text=AWP+Dragon+Lore"], ["category", "rifle"], ["wear", "minimal_wear"], ["available", 1], ["created_at", "2026-04-07 12:05:11.593816"], ["updated_at", "2026-04-07 12:05:11.593816"]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (2.8ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "AK-47 | Case Hardened"], ["description", "An AK-47 with a unique case hardened finish."], ["price", 180.0], ["rarity", "classified"], ["image_url", "https://placehold.co/400x300/3498db/ffffff?text=AK+Case+Hardened"], ["category", "rifle"], ["wear", "field_tested"], ["available", 1], ["created_at", "2026-04-07 12:05:11.601988"], ["updated_at", "2026-04-07 12:05:11.601988"]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.4ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "M4A1-S | Hyper Beast"], ["description", "A vibrant, chaotic M4A1-S skin featuring a mythical creature."], ["price", 85.0], ["rarity", "covert"], ["image_url", "https://placehold.co/400x300/9b59b6/ffffff?text=M4A1-S+Hyper+Beast"], ["category", "rifle"], ["wear", "field_tested"], ["available", 1], ["created_at", "2026-04-07 12:05:11.608333"], ["updated_at", "2026-04-07 12:05:11.608333"]]
+  [1m[36mTRANSACTION (0.4ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (2.3ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "SCAR-20 | Bloodsport"], ["description", "A striking red and black SCAR-20 skin."], ["price", 12.0], ["rarity", "classified"], ["image_url", "https://placehold.co/400x300/c0392b/ffffff?text=SCAR+Bloodsport"], ["category", "rifle"], ["wear", "factory_new"], ["available", 1], ["created_at", "2026-04-07 12:05:11.614989"], ["updated_at", "2026-04-07 12:05:11.614989"]]
+  [1m[36mTRANSACTION (0.6ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (2.2ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "Glock-18 | Fade"], ["description", "A Glock with a beautiful fade gradient finish."], ["price", 950.0], ["rarity", "restricted"], ["image_url", "https://placehold.co/400x300/9b59b6/ffffff?text=Glock+Fade"], ["category", "pistol"], ["wear", "factory_new"], ["available", 1], ["created_at", "2026-04-07 12:05:11.621643"], ["updated_at", "2026-04-07 12:05:11.621643"]]
+  [1m[36mTRANSACTION (0.4ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.5ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "Desert Eagle | Blaze"], ["description", "A Desert Eagle with a blazing fire pattern."], ["price", 320.0], ["rarity", "restricted"], ["image_url", "https://placehold.co/400x300/e67e22/ffffff?text=Deagle+Blaze"], ["category", "pistol"], ["wear", "factory_new"], ["available", 1], ["created_at", "2026-04-07 12:05:11.629726"], ["updated_at", "2026-04-07 12:05:11.629726"]]
+  [1m[36mTRANSACTION (0.4ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.4ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "USP-S | Kill Confirmed"], ["description", "A USP-S skin featuring a dramatic skull design."], ["price", 65.0], ["rarity", "covert"], ["image_url", "https://placehold.co/400x300/e74c3c/ffffff?text=USP+Kill+Confirmed"], ["category", "pistol"], ["wear", "minimal_wear"], ["available", 1], ["created_at", "2026-04-07 12:05:11.635460"], ["updated_at", "2026-04-07 12:05:11.635460"]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (2.7ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "P2000 | Fire Elemental"], ["description", "A mystical P2000 with a fire elemental design."], ["price", 15.0], ["rarity", "classified"], ["image_url", "https://placehold.co/400x300/3498db/ffffff?text=P2000+Fire+Elemental"], ["category", "pistol"], ["wear", "field_tested"], ["available", 1], ["created_at", "2026-04-07 12:05:11.641043"], ["updated_at", "2026-04-07 12:05:11.641043"]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.5ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "Five-SeveN | Monkey Business"], ["description", "A playful banana-themed Five-SeveN skin."], ["price", 3.5], ["rarity", "classified"], ["image_url", "https://placehold.co/400x300/f1c40f/000000?text=Five-SeveN+Monkey"], ["category", "pistol"], ["wear", "field_tested"], ["available", 1], ["created_at", "2026-04-07 12:05:11.647079"], ["updated_at", "2026-04-07 12:05:11.647079"]]
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.2ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "★ Sport Gloves | Pandora's Box"], ["description", "Sporty gloves with a mysterious purple and black design."], ["price", 1500.0], ["rarity", "gloves"], ["image_url", "https://placehold.co/400x300/8e44ad/ffffff?text=Sport+Gloves+Pandora"], ["category", "gloves"], ["wear", "field_tested"], ["available", 1], ["created_at", "2026-04-07 12:05:11.652684"], ["updated_at", "2026-04-07 12:05:11.652684"]]
+  [1m[36mTRANSACTION (0.4ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.3ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "★ Specialist Gloves | Crimson Kimono"], ["description", "Elegant red gloves with traditional Japanese patterns."], ["price", 950.0], ["rarity", "gloves"], ["image_url", "https://placehold.co/400x300/e74c3c/ffffff?text=Specialist+Crimson"], ["category", "gloves"], ["wear", "minimal_wear"], ["available", 1], ["created_at", "2026-04-07 12:05:11.658371"], ["updated_at", "2026-04-07 12:05:11.658371"]]
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.2ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "MP7 | Bloodsport"], ["description", "A futuristic MP7 skin with racing aesthetics."], ["price", 8.0], ["rarity", "classified"], ["image_url", "https://placehold.co/400x300/c0392b/ffffff?text=MP7+Bloodsport"], ["category", "smg"], ["wear", "factory_new"], ["available", 1], ["created_at", "2026-04-07 12:05:11.663413"], ["updated_at", "2026-04-07 12:05:11.663413"]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.4ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "P90 | Asiimov"], ["description", "A sci-fi inspired P90 skin with orange and white accents."], ["price", 22.0], ["rarity", "covert"], ["image_url", "https://placehold.co/400x300/e67e22/ffffff?text=P90+Asiimov"], ["category", "smg"], ["wear", "field_tested"], ["available", 1], ["created_at", "2026-04-07 12:05:11.669209"], ["updated_at", "2026-04-07 12:05:11.669209"]]
+  [1m[36mTRANSACTION (0.4ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.5ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "MAC-10 | Neon Rider"], ["description", "A vibrant neon-themed MAC-10 skin."], ["price", 6.5], ["rarity", "classified"], ["image_url", "https://placehold.co/400x300/9b59b6/ffffff?text=MAC-10+Neon"], ["category", "smg"], ["wear", "minimal_wear"], ["available", 1], ["created_at", "2026-04-07 12:05:11.674138"], ["updated_at", "2026-04-07 12:05:11.674138"]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.6ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "Nova | Antique"], ["description", "An elegant nova with ornate engravings."], ["price", 2.5], ["rarity", "classified"], ["image_url", "https://placehold.co/400x300/f39c12/ffffff?text=Nova+Antique"], ["category", "heavy"], ["wear", "field_tested"], ["available", 1], ["created_at", "2026-04-07 12:05:11.680255"], ["updated_at", "2026-04-07 12:05:11.680255"]]
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (2.0ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "XM1014 | Seasons"], ["description", "An XM1014 with a beautiful seasonal leaf pattern."], ["price", 4.0], ["rarity", "restricted"], ["image_url", "https://placehold.co/400x300/27ae60/ffffff?text=XM1014+Seasons"], ["category", "heavy"], ["wear", "minimal_wear"], ["available", 1], ["created_at", "2026-04-07 12:05:11.686308"], ["updated_at", "2026-04-07 12:05:11.686308"]]
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (4.1ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "MAG-7 | Heat"], ["description", "A fiery MAG-7 skin with molten metal appearance."], ["price", 1.5], ["rarity", "restricted"], ["image_url", "https://placehold.co/400x300/e74c3c/ffffff?text=MAG-7+Heat"], ["category", "heavy"], ["wear", "well_worn"], ["available", 1], ["created_at", "2026-04-07 12:05:11.694009"], ["updated_at", "2026-04-07 12:05:11.694009"]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (2.2ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "Cmdr. Mae 'Dead Cold' Jamison | SWAT"], ["description", "A SWAT team commander with tactical gear."], ["price", 8.0], ["rarity", "milspec"], ["image_url", "https://placehold.co/400x300/34495e/ffffff?text=Agent+SWAT"], ["category", "agent"], ["wear", nil], ["available", 1], ["created_at", "2026-04-07 12:05:11.703505"], ["updated_at", "2026-04-07 12:05:11.703505"]]
+  [1m[36mTRANSACTION (0.4ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.3ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "Sir Bloody Miami Darryl | The Professionals"], ["description", "A stylish agent with vibrant Miami vibes."], ["price", 25.0], ["rarity", "restricted"], ["image_url", "https://placehold.co/400x300/e91e63/ffffff?text=Agent+Miami"], ["category", "agent"], ["wear", nil], ["available", 1], ["created_at", "2026-04-07 12:05:11.710357"], ["updated_at", "2026-04-07 12:05:11.710357"]]
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.1ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "s1mple (Gold) | 2022 Legends"], ["description", "A gold sticker of the legendary player s1mple."], ["price", 45.0], ["rarity", "milspec"], ["image_url", "https://placehold.co/400x300/f1c40f/000000?text=Sticker+s1mple"], ["category", "sticker"], ["wear", nil], ["available", 1], ["created_at", "2026-04-07 12:05:11.715229"], ["updated_at", "2026-04-07 12:05:11.715229"]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (2.0ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "Titan (Holo) | Katowice 2014"], ["description", "A legendary holographic sticker from Katowice 2014."], ["price", 35000.0], ["rarity", "restricted"], ["image_url", "https://placehold.co/400x300/00bcd4/ffffff?text=Sticker+Titan"], ["category", "sticker"], ["wear", nil], ["available", 1], ["created_at", "2026-04-07 12:05:11.720319"], ["updated_at", "2026-04-07 12:05:11.720319"]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.0ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "CS:GO Weapon Case"], ["description", "A classic weapon case from the early days of CS:GO."], ["price", 3.0], ["rarity", "milspec"], ["image_url", "https://placehold.co/400x300/95a5a6/000000?text=Weapon+Case"], ["category", "case"], ["wear", nil], ["available", 1], ["created_at", "2026-04-07 12:05:11.725876"], ["updated_at", "2026-04-07 12:05:11.725876"]]
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.0ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "Operation Broken Fang Case"], ["description", "A case from the Operation Broken Fang."], ["price", 1.5], ["rarity", "milspec"], ["image_url", "https://placehold.co/400x300/3498db/ffffff?text=Broken+Fang"], ["category", "case"], ["wear", nil], ["available", 1], ["created_at", "2026-04-07 12:05:11.729598"], ["updated_at", "2026-04-07 12:05:11.729598"]]
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.8ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "Revolution Case"], ["description", "The latest case featuring community-designed skins."], ["price", 0.8], ["rarity", "milspec"], ["image_url", "https://placehold.co/400x300/9b59b6/ffffff?text=Revolution+Case"], ["category", "case"], ["wear", nil], ["available", 1], ["created_at", "2026-04-07 12:05:11.733242"], ["updated_at", "2026-04-07 12:05:11.733242"]]
+  [1m[36mTRANSACTION (0.6ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.5ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "SSG 08 | Dragonfire"], ["description", "An SSG 08 with a fearsome dragon design."], ["price", 8.5], ["rarity", "covert"], ["image_url", "https://placehold.co/400x300/c0392b/ffffff?text=SSG+Dragonfire"], ["category", "rifle"], ["wear", "field_tested"], ["available", 1], ["created_at", "2026-04-07 12:05:11.740537"], ["updated_at", "2026-04-07 12:05:11.740537"]]
+  [1m[36mTRANSACTION (0.4ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.1ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "CZ75-Auto | Yellow Jacket"], ["description", "A CZ75 with a striking wasp design."], ["price", 3.5], ["rarity", "restricted"], ["image_url", "https://placehold.co/400x300/f1c40f/000000?text=CZ75+Yellow+Jacket"], ["category", "pistol"], ["wear", "minimal_wear"], ["available", 1], ["created_at", "2026-04-07 12:05:11.745886"], ["updated_at", "2026-04-07 12:05:11.745886"]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.6ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "Negev | Mjölnir"], ["description", "A Negev skin inspired by Thor's hammer."], ["price", 180.0], ["rarity", "classified"], ["image_url", "https://placehold.co/400x300/3498db/ffffff?text=Negev+Mjolnir"], ["category", "heavy"], ["wear", "factory_new"], ["available", 1], ["created_at", "2026-04-07 12:05:11.750876"], ["updated_at", "2026-04-07 12:05:11.750876"]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (1.3ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "R8 Revolver | Fade"], ["description", "An R8 Revolver with a beautiful fade pattern."], ["price", 120.0], ["rarity", "restricted"], ["image_url", "https://placehold.co/400x300/9b59b6/ffffff?text=R8+Fade"], ["category", "pistol"], ["wear", "factory_new"], ["available", 1], ["created_at", "2026-04-07 12:05:11.756740"], ["updated_at", "2026-04-07 12:05:11.756740"]]
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mbegin transaction[0m
+  [1m[36mProduct Create (2.1ms)[0m  [1m[32mINSERT INTO "products" ("name", "description", "price", "rarity", "image_url", "category", "wear", "available", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["name", "Sawed-Off | Kraken"], ["description", "A Sawed-Off with a terrifying sea monster design."], ["price", 6.0], ["rarity", "classified"], ["image_url", "https://cdn.tradeit.gg/seo%2Fcsgo%2FSawed-Off%20-%20The%20Kraken%20(Factory%20New)_1200x675.webp"], ["category", "heavy"], ["wear", "field_tested"], ["available", 1], ["created_at", "2026-04-07 12:05:11.761938"], ["updated_at", "2026-04-07 12:05:11.761938"]]
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mProduct Count (0.5ms)[0m  [1m[34mSELECT COUNT(*) FROM "products"[0m
+Started GET "/" for ::1 at 2026-04-07 19:05:15 +0700
+Processing by ProductsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering products/index.html.erb within layouts/application
+  [1m[36mProduct Exists? (0.4ms)[0m  [1m[34mSELECT 1 AS one FROM "products" WHERE "products"."available" = ? LIMIT ?[0m  [["available", 1], ["LIMIT", 1]]
+  ↳ app/views/products/index.html.erb:47:in '_app_views_products_index_html_erb___601777427_9560'
+  [1m[36mProduct Load (0.5ms)[0m  [1m[34mSELECT "products".* FROM "products" WHERE "products"."available" = ? ORDER BY "products"."created_at" DESC LIMIT ?[0m  [["available", 1], ["LIMIT", 50]]
+  ↳ app/views/products/index.html.erb:49:in '_app_views_products_index_html_erb___601777427_9560'
+  Rendered products/index.html.erb within layouts/application (Duration: 45.8ms | Allocations: 16457)
+  Rendered layouts/_navbar.html.erb (Duration: 0.8ms | Allocations: 100)
+  Rendered layouts/_footer.html.erb (Duration: 0.7ms | Allocations: 90)
+  Rendered layout layouts/application.html.erb (Duration: 61.8ms | Allocations: 17605)
+Completed 200 OK in 74ms (Views: 62.5ms | ActiveRecord: 0.9ms | Allocations: 17905)
+
+
+Started GET "/favicon.ico" for ::1 at 2026-04-07 19:05:17 +0700
+  
+ActionController::RoutingError (No route matches [GET] "/favicon.ico"):
+  
+Started GET "/login" for ::1 at 2026-04-07 19:06:59 +0700
+Processing by SessionsController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering sessions/new.html.erb within layouts/application
+  Rendered sessions/new.html.erb within layouts/application (Duration: 1.8ms | Allocations: 2067)
+  Rendered layouts/_navbar.html.erb (Duration: 0.4ms | Allocations: 100)
+  Rendered layouts/_footer.html.erb (Duration: 0.4ms | Allocations: 90)
+  Rendered layout layouts/application.html.erb (Duration: 19.4ms | Allocations: 3223)
+Completed 200 OK in 32ms (Views: 22.2ms | ActiveRecord: 0.0ms | Allocations: 3668)
+
+
+Started POST "/login" for ::1 at 2026-04-07 19:07:14 +0700
+Processing by SessionsController#create as HTML
+  Parameters: {"authenticity_token" => "[FILTERED]", "email" => "admin@skinsmonkey.com", "password" => "[FILTERED]", "commit" => "Login"}
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."email" = ? LIMIT ?[0m  [["email", "admin@skinsmonkey.com"], ["LIMIT", 1]]
+  ↳ app/controllers/sessions_controller.rb:8:in 'SessionsController#create'
+  Rendering layout layouts/application.html.erb
+  Rendering sessions/new.html.erb within layouts/application
+  Rendered sessions/new.html.erb within layouts/application (Duration: 3.4ms | Allocations: 1970)
+  Rendered layouts/_navbar.html.erb (Duration: 2.0ms | Allocations: 100)
+  Rendered layouts/_footer.html.erb (Duration: 0.5ms | Allocations: 90)
+  Rendered layout layouts/application.html.erb (Duration: 30.0ms | Allocations: 3112)
+Completed 422 Unprocessable Content in 604ms (Views: 40.6ms | ActiveRecord: 0.8ms | Allocations: 12979)
+
+
+Started POST "/login" for ::1 at 2026-04-07 19:07:27 +0700
+Processing by SessionsController#create as HTML
+  Parameters: {"authenticity_token" => "[FILTERED]", "email" => "admin@skinsmonkey.com", "password" => "[FILTERED]", "commit" => "Login"}
+  [1m[36mUser Load (0.7ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."email" = ? LIMIT ?[0m  [["email", "admin@skinsmonkey.com"], ["LIMIT", 1]]
+  ↳ app/controllers/sessions_controller.rb:8:in 'SessionsController#create'
+  Rendering layout layouts/application.html.erb
+  Rendering sessions/new.html.erb within layouts/application
+  Rendered sessions/new.html.erb within layouts/application (Duration: 4.6ms | Allocations: 2056)
+  Rendered layouts/_navbar.html.erb (Duration: 0.8ms | Allocations: 100)
+  Rendered layouts/_footer.html.erb (Duration: 0.7ms | Allocations: 90)
+  Rendered layout layouts/application.html.erb (Duration: 43.5ms | Allocations: 3197)
+Completed 422 Unprocessable Content in 83ms (Views: 51.0ms | ActiveRecord: 0.7ms | Allocations: 4074)
+
+
+Started POST "/login" for ::1 at 2026-04-07 19:07:46 +0700
+Processing by SessionsController#create as HTML
+  Parameters: {"authenticity_token" => "[FILTERED]", "email" => "admin@skinsmonkey.com", "password" => "[FILTERED]", "commit" => "Login"}
+  [1m[36mUser Load (0.1ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."email" = ? LIMIT ?[0m  [["email", "admin@skinsmonkey.com"], ["LIMIT", 1]]
+  ↳ app/controllers/sessions_controller.rb:8:in 'SessionsController#create'
+  Rendering layout layouts/application.html.erb
+  Rendering sessions/new.html.erb within layouts/application
+  Rendered sessions/new.html.erb within layouts/application (Duration: 1.9ms | Allocations: 2056)
+  Rendered layouts/_navbar.html.erb (Duration: 0.8ms | Allocations: 100)
+  Rendered layouts/_footer.html.erb (Duration: 4.3ms | Allocations: 90)
+  Rendered layout layouts/application.html.erb (Duration: 36.7ms | Allocations: 3197)
+Completed 422 Unprocessable Content in 65ms (Views: 42.5ms | ActiveRecord: 0.1ms | Allocations: 4065)
+
+
+Started POST "/login" for ::1 at 2026-04-07 19:07:49 +0700
+Processing by SessionsController#create as HTML
+  Parameters: {"authenticity_token" => "[FILTERED]", "email" => "admin@skinsmonkey.com", "password" => "[FILTERED]", "commit" => "Login"}
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."email" = ? LIMIT ?[0m  [["email", "admin@skinsmonkey.com"], ["LIMIT", 1]]
+  ↳ app/controllers/sessions_controller.rb:8:in 'SessionsController#create'
+  Rendering layout layouts/application.html.erb
+  Rendering sessions/new.html.erb within layouts/application
+  Rendered sessions/new.html.erb within layouts/application (Duration: 1.7ms | Allocations: 2057)
+  Rendered layouts/_navbar.html.erb (Duration: 0.4ms | Allocations: 100)
+  Rendered layouts/_footer.html.erb (Duration: 0.9ms | Allocations: 90)
+  Rendered layout layouts/application.html.erb (Duration: 73.8ms | Allocations: 3199)
+Completed 422 Unprocessable Content in 154ms (Views: 92.0ms | ActiveRecord: 0.3ms | Allocations: 4077)
+
+
+Started POST "/login" for ::1 at 2026-04-07 19:08:14 +0700
+Processing by SessionsController#create as HTML
+  Parameters: {"authenticity_token" => "[FILTERED]", "email" => "test@example.com", "password" => "[FILTERED]", "commit" => "Login"}
+  [1m[36mUser Load (0.1ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."email" = ? LIMIT ?[0m  [["email", "test@example.com"], ["LIMIT", 1]]
+  ↳ app/controllers/sessions_controller.rb:8:in 'SessionsController#create'
+  Rendering layout layouts/application.html.erb
+  Rendering sessions/new.html.erb within layouts/application
+  Rendered sessions/new.html.erb within layouts/application (Duration: 1.6ms | Allocations: 2056)
+  Rendered layouts/_navbar.html.erb (Duration: 0.4ms | Allocations: 100)
+  Rendered layouts/_footer.html.erb (Duration: 0.4ms | Allocations: 90)
+  Rendered layout layouts/application.html.erb (Duration: 25.7ms | Allocations: 3197)
+Completed 422 Unprocessable Content in 53ms (Views: 30.5ms | ActiveRecord: 0.1ms | Allocations: 4068)
+
+
+Started GET "/signup" for ::1 at 2026-04-07 19:08:19 +0700
+Processing by UsersController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering users/new.html.erb within layouts/application
+  Rendered users/new.html.erb within layouts/application (Duration: 7.5ms | Allocations: 935)
+  Rendered layouts/_navbar.html.erb (Duration: 0.4ms | Allocations: 100)
+  Rendered layouts/_footer.html.erb (Duration: 0.4ms | Allocations: 90)
+  Rendered layout layouts/application.html.erb (Duration: 75.3ms | Allocations: 2092)
+Completed 200 OK in 154ms (Views: 107.9ms | ActiveRecord: 0.7ms | Allocations: 6760)
+
+
+Started POST "/signup" for ::1 at 2026-04-07 19:08:31 +0700
+Processing by UsersController#create as HTML
+  Parameters: {"authenticity_token" => "[FILTERED]", "user" => {"username" => "user1", "email" => "user1@gmail.com", "password" => "[FILTERED]", "password_confirmation" => "[FILTERED]"}, "commit" => "Create Account"}
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  ↳ app/controllers/users_controller.rb:12:in 'UsersController#create'
+  [1m[36mUser Exists? (17.4ms)[0m  [1m[34mSELECT 1 AS one FROM "users" WHERE "users"."username" = ? LIMIT ?[0m  [["username", "user1"], ["LIMIT", 1]]
+  ↳ app/controllers/users_controller.rb:12:in 'UsersController#create'
+  [1m[36mUser Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "users" WHERE "users"."email" = ? LIMIT ?[0m  [["email", "user1@gmail.com"], ["LIMIT", 1]]
+  ↳ app/controllers/users_controller.rb:12:in 'UsersController#create'
+  [1m[36mUser Create (3.5ms)[0m  [1m[32mINSERT INTO "users" ("username", "email", "password_digest", "balance", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["username", "user1"], ["email", "user1@gmail.com"], ["password_digest", "[FILTERED]"], ["balance", 0.0], ["created_at", "2026-04-07 12:08:32.277545"], ["updated_at", "2026-04-07 12:08:32.277545"]]
+  ↳ app/controllers/users_controller.rb:12:in 'UsersController#create'
+  [1m[36mCart Create (0.4ms)[0m  [1m[32mINSERT INTO "carts" ("user_id", "created_at", "updated_at") VALUES (?, ?, ?) RETURNING "id"[0m  [["user_id", 1], ["created_at", "2026-04-07 12:08:32.624733"], ["updated_at", "2026-04-07 12:08:32.624733"]]
+  ↳ app/models/user.rb:18:in 'User#create_cart'
+  [1m[36mTRANSACTION (7.1ms)[0m  [1m[36mcommit transaction[0m
+  ↳ app/controllers/users_controller.rb:12:in 'UsersController#create'
+Redirected to http://localhost:3000/
+Completed 302 Found in 982ms (ActiveRecord: 33.4ms | Allocations: 14197)
+
+
+Started GET "/" for ::1 at 2026-04-07 19:08:32 +0700
+Processing by ProductsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering products/index.html.erb within layouts/application
+  [1m[36mProduct Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "products" WHERE "products"."available" = ? LIMIT ?[0m  [["available", 1], ["LIMIT", 1]]
+  ↳ app/views/products/index.html.erb:47:in '_app_views_products_index_html_erb___601777427_9560'
+  [1m[36mProduct Load (3.7ms)[0m  [1m[34mSELECT "products".* FROM "products" WHERE "products"."available" = ? ORDER BY "products"."created_at" DESC LIMIT ?[0m  [["available", 1], ["LIMIT", 50]]
+  ↳ app/views/products/index.html.erb:49:in '_app_views_products_index_html_erb___601777427_9560'
+  Rendered products/index.html.erb within layouts/application (Duration: 87.1ms | Allocations: 16465)
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?[0m  [["id", 1], ["LIMIT", 1]]
+  ↳ app/controllers/application_controller.rb:5:in 'ApplicationController#current_user'
+  [1m[36mCart Load (0.3ms)[0m  [1m[34mSELECT "carts".* FROM "carts" WHERE "carts"."user_id" = ? LIMIT ?[0m  [["user_id", 1], ["LIMIT", 1]]
+  ↳ app/views/layouts/_navbar.html.erb:18:in 'block in _app_views_layouts__navbar_html_erb___17614677_9952'
+  [1m[36mCartItem Sum (2.1ms)[0m  [1m[34mSELECT SUM("cart_items"."quantity") FROM "cart_items" WHERE "cart_items"."cart_id" = ?[0m  [["cart_id", 1]]
+  ↳ app/models/cart.rb:11:in 'Cart#total_items'
+  Rendered layouts/_navbar.html.erb (Duration: 210.4ms | Allocations: 6625)
+  Rendered layouts/_footer.html.erb (Duration: 1.9ms | Allocations: 187)
+  Rendered layout layouts/application.html.erb (Duration: 420.1ms | Allocations: 24238)
+Completed 200 OK in 461ms (Views: 432.4ms | ActiveRecord: 16.4ms | Allocations: 24539)
+
+
+Started POST "/cart/add/68" for ::1 at 2026-04-07 19:08:38 +0700
+Processing by CartsController#add as HTML
+  Parameters: {"authenticity_token" => "[FILTERED]", "product_id" => "68"}
+  [1m[36mUser Load (0.1ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?[0m  [["id", 1], ["LIMIT", 1]]
+  ↳ app/controllers/application_controller.rb:5:in 'ApplicationController#current_user'
+  [1m[36mCart Load (0.2ms)[0m  [1m[34mSELECT "carts".* FROM "carts" WHERE "carts"."user_id" = ? LIMIT ?[0m  [["user_id", 1], ["LIMIT", 1]]
+  ↳ app/controllers/carts_controller.rb:10:in 'CartsController#add'
+  [1m[36mProduct Load (0.1ms)[0m  [1m[34mSELECT "products".* FROM "products" WHERE "products"."id" = ? LIMIT ?[0m  [["id", 68], ["LIMIT", 1]]
+  ↳ app/controllers/carts_controller.rb:11:in 'CartsController#add'
+  [1m[36mCartItem Load (0.2ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."cart_id" = ? AND "cart_items"."product_id" = ? LIMIT ?[0m  [["cart_id", 1], ["product_id", 68], ["LIMIT", 1]]
+  ↳ app/controllers/carts_controller.rb:13:in 'CartsController#add'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mbegin transaction[0m
+  ↳ app/controllers/carts_controller.rb:17:in 'CartsController#add'
+  [1m[36mCartItem Create (16.2ms)[0m  [1m[32mINSERT INTO "cart_items" ("cart_id", "product_id", "quantity", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?) RETURNING "id"[0m  [["cart_id", 1], ["product_id", 68], ["quantity", 1], ["created_at", "2026-04-07 12:08:38.602978"], ["updated_at", "2026-04-07 12:08:38.602978"]]
+  ↳ app/controllers/carts_controller.rb:17:in 'CartsController#add'
+  [1m[36mTRANSACTION (0.9ms)[0m  [1m[36mcommit transaction[0m
+  ↳ app/controllers/carts_controller.rb:17:in 'CartsController#add'
+Redirected to http://localhost:3000/
+Completed 302 Found in 198ms (ActiveRecord: 17.9ms | Allocations: 8769)
+
+
+Started GET "/" for ::1 at 2026-04-07 19:08:38 +0700
+Processing by ProductsController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering products/index.html.erb within layouts/application
+  [1m[36mProduct Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "products" WHERE "products"."available" = ? LIMIT ?[0m  [["available", 1], ["LIMIT", 1]]
+  ↳ app/views/products/index.html.erb:47:in '_app_views_products_index_html_erb___601777427_9560'
+  [1m[36mProduct Load (0.5ms)[0m  [1m[34mSELECT "products".* FROM "products" WHERE "products"."available" = ? ORDER BY "products"."created_at" DESC LIMIT ?[0m  [["available", 1], ["LIMIT", 50]]
+  ↳ app/views/products/index.html.erb:49:in '_app_views_products_index_html_erb___601777427_9560'
+  Rendered products/index.html.erb within layouts/application (Duration: 69.7ms | Allocations: 16476)
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?[0m  [["id", 1], ["LIMIT", 1]]
+  ↳ app/controllers/application_controller.rb:5:in 'ApplicationController#current_user'
+  [1m[36mCart Load (0.2ms)[0m  [1m[34mSELECT "carts".* FROM "carts" WHERE "carts"."user_id" = ? LIMIT ?[0m  [["user_id", 1], ["LIMIT", 1]]
+  ↳ app/views/layouts/_navbar.html.erb:18:in 'block in _app_views_layouts__navbar_html_erb___17614677_9952'
+  [1m[36mCartItem Sum (0.2ms)[0m  [1m[34mSELECT SUM("cart_items"."quantity") FROM "cart_items" WHERE "cart_items"."cart_id" = ?[0m  [["cart_id", 1]]
+  ↳ app/models/cart.rb:11:in 'Cart#total_items'
+  [1m[36mCACHE CartItem Sum (0.0ms)[0m  [1m[34mSELECT SUM("cart_items"."quantity") FROM "cart_items" WHERE "cart_items"."cart_id" = ?[0m  [["cart_id", 1]]
+  ↳ app/models/cart.rb:11:in 'Cart#total_items'
+  Rendered layouts/_navbar.html.erb (Duration: 18.7ms | Allocations: 2073)
+  Rendered layouts/_footer.html.erb (Duration: 0.9ms | Allocations: 186)
+  Rendered layout layouts/application.html.erb (Duration: 104.0ms | Allocations: 19698)
+Completed 200 OK in 118ms (Views: 104.9ms | ActiveRecord: 1.3ms | Allocations: 19998)
+
+
+Started GET "/cart" for ::1 at 2026-04-07 19:08:40 +0700
+Processing by CartsController#show as HTML
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?[0m  [["id", 1], ["LIMIT", 1]]
+  ↳ app/controllers/application_controller.rb:5:in 'ApplicationController#current_user'
+  [1m[36mCart Load (0.2ms)[0m  [1m[34mSELECT "carts".* FROM "carts" WHERE "carts"."user_id" = ? LIMIT ?[0m  [["user_id", 1], ["LIMIT", 1]]
+  ↳ app/controllers/carts_controller.rb:5:in 'CartsController#show'
+  Rendering layout layouts/application.html.erb
+  Rendering carts/show.html.erb within layouts/application
+  [1m[36mCartItem Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "cart_items" WHERE "cart_items"."cart_id" = ? LIMIT ?[0m  [["cart_id", 1], ["LIMIT", 1]]
+  ↳ app/views/carts/show.html.erb:4:in '_app_views_carts_show_html_erb__375281239_10888'
+  [1m[36mCartItem Load (0.2ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."cart_id" = ?[0m  [["cart_id", 1]]
+  ↳ app/views/carts/show.html.erb:7:in '_app_views_carts_show_html_erb__375281239_10888'
+  [1m[36mProduct Load (0.3ms)[0m  [1m[34mSELECT "products".* FROM "products" WHERE "products"."id" = ?[0m  [["id", 68]]
+  ↳ app/views/carts/show.html.erb:7:in '_app_views_carts_show_html_erb__375281239_10888'
+  [1m[36mCartItem Sum (0.1ms)[0m  [1m[34mSELECT SUM("cart_items"."quantity") FROM "cart_items" WHERE "cart_items"."cart_id" = ?[0m  [["cart_id", 1]]
+  ↳ app/models/cart.rb:11:in 'Cart#total_items'
+  [1m[36mCACHE CartItem Load (0.0ms)[0m  [1m[34mSELECT "cart_items".* FROM "cart_items" WHERE "cart_items"."cart_id" = ?[0m  [["cart_id", 1]]
+  ↳ app/models/cart.rb:7:in 'Cart#total_price'
+  [1m[36mProduct Load (0.1ms)[0m  [1m[34mSELECT "products".* FROM "products" WHERE "products"."id" = ? LIMIT ?[0m  [["id", 68], ["LIMIT", 1]]
+  ↳ app/models/cart.rb:7:in 'block in Cart#total_price'
+  Rendered carts/show.html.erb within layouts/application (Duration: 462.2ms | Allocations: 9152)
+  [1m[36mCACHE CartItem Sum (0.0ms)[0m  [1m[34mSELECT SUM("cart_items"."quantity") FROM "cart_items" WHERE "cart_items"."cart_id" = ?[0m  [["cart_id", 1]]
+  ↳ app/models/cart.rb:11:in 'Cart#total_items'
+  [1m[36mCACHE CartItem Sum (0.0ms)[0m  [1m[34mSELECT SUM("cart_items"."quantity") FROM "cart_items" WHERE "cart_items"."cart_id" = ?[0m  [["cart_id", 1]]
+  ↳ app/models/cart.rb:11:in 'Cart#total_items'
+  Rendered layouts/_navbar.html.erb (Duration: 115.8ms | Allocations: 1047)
+  Rendered layouts/_footer.html.erb (Duration: 0.8ms | Allocations: 186)
+  Rendered layout layouts/application.html.erb (Duration: 700.1ms | Allocations: 11351)
+Completed 200 OK in 892ms (Views: 796.7ms | ActiveRecord: 1.4ms | Allocations: 12984)
+
+
+Started GET "/checkout" for ::1 at 2026-04-07 19:08:43 +0700
+Processing by OrdersController#new as HTML
+  [1m[36mUser Load (0.1ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?[0m  [["id", 1], ["LIMIT", 1]]
+  ↳ app/controllers/application_controller.rb:5:in 'ApplicationController#current_user'
+  [1m[36mCart Load (0.4ms)[0m  [1m[34mSELECT "carts".* FROM "carts" WHERE "carts"."user_id" = ? LIMIT ?[0m  [["user_id", 1], ["LIMIT", 1]]
+  ↳ app/controllers/orders_controller.rb:14:in 'OrdersController#new'
+  [1m[36mCartItem Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "cart_items" WHERE "cart_items"."cart_id" = ? LIMIT ?[0m  [["cart_id", 1], ["LIMIT", 1]]
+  ↳ app/controllers/orders_controller.rb:17:in 'OrdersController#new'
+  Rendering layout layouts/application.html.erb
+  Rendering orders/new.html.erb within layouts/application
+  Rendered orders/new.html.erb within layouts/application (Duration: 8.8ms | Allocations: 1577)
+  Rendered layout layouts/application.html.erb (Duration: 17.4ms | Allocations: 1661)
+Completed 500 Internal Server Error in 204ms (ActiveRecord: 0.7ms | Allocations: 3774)
+
+
+  
+ActionView::Template::Error (undefined method 'errors' for nil):
+    4:   <div class="checkout-layout">
+    5:     <div class="checkout-form-section">
+    6:       <%= form_with model: @order, url: checkout_path, class: "checkout-form" do |f| %>
+    7:         <% if @order.errors.any? %>
+    8:           <div class="error-messages">
+    9:             <ul>
+   10:               <% @order.errors.full_messages.each do |message| %>
+  
+app/views/orders/new.html.erb:7:in 'block in _app_views_orders_new_html_erb___82079117_10936'
+app/views/orders/new.html.erb:6:in '_app_views_orders_new_html_erb___82079117_10936'
